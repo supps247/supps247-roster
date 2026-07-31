@@ -4,18 +4,40 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Supps247 Roster Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div class="bg-orb orb-a"></div>
+  <div class="bg-orb orb-b"></div>
   <header class="topbar">
     <div>
       <div class="brand">SUPPS247</div>
       <div class="subbrand">Roster Admin</div>
     </div>
-    <div class="header-status"><span id="connectionStatus" class="sync-status offline">Sign in required</span><button id="logoutBtn" class="ghost compact hidden">Log out</button><span class="admin-badge">ADMIN ONLY</span></div>
+    <div class="header-status">
+      <span id="connectionStatus" class="sync-status offline">Sign in required</span>
+      <button id="logoutBtn" class="ghost compact hidden">Log out</button>
+      <span class="admin-badge">ADMIN ONLY</span>
+    </div>
   </header>
 
   <main class="container">
+    <section class="hero card">
+      <div>
+        <p class="eyebrow">WORKS WITH SUPABASE</p>
+        <h1>Plan weekly shifts with less friction.</h1>
+        <p class="hero-copy">A clean roster workspace for managers and accountants: secure login, weekly planning, outlet batches, exports, and live sync.</p>
+      </div>
+      <div class="hero-panel">
+        <div class="mini-stat"><span>Today</span><strong id="heroToday">0</strong></div>
+        <div class="mini-stat"><span>This week</span><strong id="heroWeek">0</strong></div>
+        <div class="mini-stat"><span>Outlets</span><strong id="heroOutlets">0</strong></div>
+      </div>
+    </section>
+
     <section id="loginView" class="card auth-card">
       <p class="eyebrow">SECURE CLOUD ACCESS</p>
       <h2>Sign in to Supps247 Roster</h2>
@@ -58,7 +80,8 @@
           <button id="clearWeek" class="danger compact">Clear week</button>
           <button id="bulkRoster" class="secondary compact">Outlet weekly roster</button>
           <button id="addShift" class="primary compact">+ Add shift</button>
-          <button id="exportRoster" class="secondary compact">Export roster CSV</button><button id="downloadBackup" class="secondary compact">Download JSON backup</button>
+          <button id="exportRoster" class="secondary compact">Export roster CSV</button>
+          <button id="downloadBackup" class="secondary compact">Download JSON backup</button>
         </div>
 
         <div class="table-wrap">
@@ -75,13 +98,59 @@
       </div>
 
       <div class="card">
-        <div class="section-title">
+        <div class="section-title wrap">
           <div>
-            <p class="eyebrow">TODAY</p>
-            <h2>Today’s roster</h2>
+            <p class="eyebrow">OUTLET VIEW</p>
+            <h2>Week roster by outlet</h2>
+          </div>
+          <p class="muted small-note">Each outlet shows the whole week in one place.</p>
+        </div>
+        <div class="table-wrap">
+          <table class="outlet-table">
+            <thead>
+              <tr>
+                <th>Outlet</th>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+                <th>Sun</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody id="outletRosterBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">TODAY</p>
+              <h2>Today’s roster</h2>
+            </div>
+          </div>
+          <div id="teamList" class="team-list"></div>
+        </div>
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">SETUP</p>
+              <h2>Supabase status</h2>
+            </div>
+          </div>
+          <div class="setup-box">
+            <p class="muted">If the database has not been initialised yet, run <code>setup.sql</code> in the Supabase SQL editor.</p>
+            <ul class="setup-list">
+              <li>Auth users sign in with email and password.</li>
+              <li>Live sync uses the <code>roster_state</code> table.</li>
+              <li>Only authenticated users can read and save state.</li>
+            </ul>
           </div>
         </div>
-        <div id="teamList" class="team-list"></div>
       </div>
     </section>
   </main>
