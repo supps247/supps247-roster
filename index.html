@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supps247 Roster Admin</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="brand">SUPPS247</div>
+      <div class="subbrand">Roster Admin</div>
+    </div>
+    <div class="header-status"><span id="connectionStatus" class="sync-status offline">Sign in required</span><button id="logoutBtn" class="ghost compact hidden">Log out</button><span class="admin-badge">ADMIN ONLY</span></div>
+  </header>
+
+  <main class="container">
+    <section id="loginView" class="card auth-card">
+      <p class="eyebrow">SECURE CLOUD ACCESS</p>
+      <h2>Sign in to Supps247 Roster</h2>
+      <p class="muted">Use the email and password created in Supabase Authentication.</p>
+      <form id="loginForm" class="form-grid auth-form">
+        <label class="full">Email<input id="loginEmail" type="email" required autocomplete="email" /></label>
+        <label class="full">Password<input id="loginPassword" type="password" required autocomplete="current-password" /></label>
+        <button class="primary full" type="submit">Sign in</button>
+      </form>
+      <p id="loginError" class="error-text hidden"></p>
+    </section>
+
+    <section id="managerView" class="hidden">
+      <div class="stats-grid">
+        <div class="stat card"><span>Rostered today</span><strong id="rosteredToday">0</strong></div>
+        <div class="stat card"><span>Active outlets today</span><strong id="activeOutlets">0</strong></div>
+        <div class="stat card"><span>Shifts this week</span><strong id="weeklyShifts">0</strong></div>
+        <div class="stat card"><span>Roster hours</span><strong id="managerHours">0.0</strong></div>
+      </div>
+
+      <div class="card">
+        <div class="section-title wrap">
+          <div>
+            <p class="eyebrow">ROSTER BUILDER</p>
+            <h2>Create weekly rosters</h2>
+          </div>
+          <div class="week-controls">
+            <button id="prevWeek" class="ghost compact">←</button>
+            <span id="managerWeekLabel" class="pill"></span>
+            <button id="nextWeek" class="ghost compact">→</button>
+          </div>
+        </div>
+
+        <div class="roster-toolbar">
+          <label>
+            Employee
+            <select id="employeeFilter"></select>
+          </label>
+          <button id="copyWeek" class="secondary compact">Copy previous week</button>
+          <button id="clearWeek" class="danger compact">Clear week</button>
+          <button id="bulkRoster" class="secondary compact">Outlet weekly roster</button>
+          <button id="addShift" class="primary compact">+ Add shift</button>
+          <button id="exportRoster" class="secondary compact">Export roster CSV</button><button id="downloadBackup" class="secondary compact">Download JSON backup</button>
+        </div>
+
+        <div class="table-wrap">
+          <table class="roster-table">
+            <thead>
+              <tr>
+                <th>Day</th><th>Employee</th><th>Location</th><th>Start</th><th>Finish</th><th>Break</th><th>Hours</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="rosterTableBody"></tbody>
+          </table>
+        </div>
+        <p class="muted small-note">Roster data is saved securely in Supabase and updates live on every connected computer.</p>
+      </div>
+
+      <div class="card">
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">TODAY</p>
+            <h2>Today’s roster</h2>
+          </div>
+        </div>
+        <div id="teamList" class="team-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="shiftDialog">
+    <form id="shiftForm" method="dialog" class="dialog-card">
+      <div class="section-title">
+        <h2 id="dialogTitle">Add shift</h2>
+        <button type="button" id="closeDialog" class="ghost compact">✕</button>
+      </div>
+      <input type="hidden" id="shiftId" />
+      <div class="form-grid">
+        <label>Employee<select id="shiftEmployee" required></select></label>
+        <label>Date<input id="shiftDate" type="date" required /></label>
+        <label>Location<select id="shiftLocation" required></select></label>
+        <label>Start time<input id="shiftStart" type="time" required value="09:00" /></label>
+        <label>Finish time<input id="shiftEnd" type="time" required value="17:00" /></label>
+        <label>Unpaid break (minutes)<input id="shiftBreak" type="number" min="0" step="5" value="30" /></label>
+        <label class="full">Notes<input id="shiftNotes" type="text" placeholder="Optional" /></label>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="cancelDialog" class="secondary">Cancel</button>
+        <button type="submit" class="primary">Save shift</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="bulkRosterDialog" class="wide-dialog">
+    <form id="bulkRosterForm" method="dialog" class="dialog-card">
+      <div class="section-title">
+        <div>
+          <p class="eyebrow">OUTLET WEEKLY ROSTER</p>
+          <h2>Add a full outlet roster in one go</h2>
+        </div>
+        <button type="button" id="closeBulkDialog" class="ghost compact">✕</button>
+      </div>
+      <div class="bulk-header">
+        <label>Outlet<select id="bulkLocation" required></select></label>
+        <label>Week starting<input id="bulkWeek" type="date" required /></label>
+      </div>
+      <p class="muted small-note">Set each day separately. An employee can work a half day on one day and a full day on another. Multiple employees can also work at the same outlet on the same day.</p>
+      <div class="table-wrap bulk-wrap">
+        <table class="bulk-table">
+          <thead><tr><th>Employee</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr></thead>
+          <tbody id="bulkRosterBody"></tbody>
+        </table>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="cancelBulkDialog" class="secondary">Cancel</button>
+        <button type="submit" class="primary">Save outlet roster</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>
