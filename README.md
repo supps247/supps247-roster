@@ -1,6 +1,6 @@
 # Supps247 Roster
 
-Static roster app for Supps247 with Supabase auth, live roster sync, weekly planning, CSV export, and JSON backups.
+Static roster app for Supps247 with Supabase auth, live roster sync, weekly planning, payroll summaries, CSV export, and JSON backups.
 
 ## Run locally
 
@@ -21,4 +21,5 @@ This repo is ready for static hosting on Vercel, Netlify, or any host that serve
 ## Notes
 
 - The browser uses the public Supabase key in `app.js`.
+- Payroll uses configurable hourly rates in the new payroll panel and stores them in the same roster state.
 - Do not place a `service_role` key in the front end.
