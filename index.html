@@ -29,7 +29,7 @@
       <div>
         <p class="eyebrow">WORKS WITH SUPABASE</p>
         <h1>Plan weekly shifts with less friction.</h1>
-        <p class="hero-copy">A clean roster workspace for managers and accountants: secure login, weekly planning, outlet batches, exports, and live sync.</p>
+        <p class="hero-copy">A clean roster workspace for managers and accountants: secure login, weekly planning, outlet batches, payroll summaries, exports, and live sync.</p>
       </div>
       <div class="hero-panel">
         <div class="mini-stat"><span>Today</span><strong id="heroToday">0</strong></div>
@@ -147,8 +147,79 @@
             <ul class="setup-list">
               <li>Auth users sign in with email and password.</li>
               <li>Live sync uses the <code>roster_state</code> table.</li>
+              <li>Payroll summaries and rates live in the same roster state.</li>
               <li>Only authenticated users can read and save state.</li>
             </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card payroll-card">
+        <div class="section-title wrap">
+          <div>
+            <p class="eyebrow">PAYROLL</p>
+            <h2>Payroll summary</h2>
+          </div>
+          <div class="payroll-actions">
+            <span id="payrollPeriodLabel" class="pill"></span>
+            <button id="payrollUseRosterWeek" class="secondary compact">Use roster week</button>
+            <button id="resetPayrollOverrides" class="ghost compact">Reset overrides</button>
+            <button id="exportPayroll" class="secondary compact">Export payroll CSV</button>
+          </div>
+        </div>
+
+        <div class="payroll-controls">
+          <label>From<input id="payrollStart" type="date" /></label>
+          <label>To<input id="payrollEnd" type="date" /></label>
+          <label>Default rate (AUD/hr)<input id="payrollDefaultRate" type="number" min="0" step="0.01" /></label>
+          <label>OT threshold (hours)<input id="payrollThreshold" type="number" min="0" step="0.5" /></label>
+          <label>OT multiplier<input id="payrollMultiplier" type="number" min="1" step="0.1" /></label>
+        </div>
+
+        <div class="stats-grid payroll-stats">
+          <div class="stat card"><span>People paid</span><strong id="payrollPeople">0</strong></div>
+          <div class="stat card"><span>Pay hours</span><strong id="payrollHours">0.0</strong></div>
+          <div class="stat card"><span>Overtime hours</span><strong id="payrollOvertime">0.0</strong></div>
+          <div class="stat card"><span>Gross payroll</span><strong id="payrollGross">$0.00</strong></div>
+        </div>
+
+        <div class="payroll-layout">
+          <div class="table-wrap">
+            <table class="payroll-table">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Shifts</th>
+                  <th>Hours</th>
+                  <th>OT Hours</th>
+                  <th>Rate</th>
+                  <th>Gross</th>
+                  <th>Locations</th>
+                </tr>
+              </thead>
+              <tbody id="payrollTableBody"></tbody>
+            </table>
+          </div>
+
+          <div class="payroll-panel">
+            <div class="section-title">
+              <div>
+                <p class="eyebrow">RATES</p>
+                <h3>Employee rates</h3>
+              </div>
+            </div>
+            <p class="muted small-note">Clear a rate to fall back to the default hourly rate.</p>
+            <div class="table-wrap rate-wrap">
+              <table class="rates-table">
+                <thead>
+                  <tr>
+                    <th>Employee</th>
+                    <th>Rate</th>
+                  </tr>
+                </thead>
+                <tbody id="payrollRatesBody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -208,5 +279,6 @@
   <div id="toast" class="toast hidden"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
+  <script src="payroll.js"></script>
 </body>
 </html>
