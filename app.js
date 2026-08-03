@@ -17,7 +17,13 @@ const defaultState = {
   updatedBy: 'system',
   employees: SUPPS247_EMPLOYEES,
   locations: SUPPS247_LOCATIONS,
-  shifts: []
+  shifts: [],
+  payroll: {
+    defaultHourlyRate: 25,
+    overtimeThresholdHours: 38,
+    overtimeMultiplier: 1.5,
+    employeeRates: {}
+  }
 };
 
 let state = structuredClone(defaultState);
@@ -106,7 +112,7 @@ async function save() {
   }
   saving = true;
   setConnection(true, 'Saving…');
-  const payload = { employees: state.employees, locations: state.locations, shifts: state.shifts };
+  const payload = { employees: state.employees, locations: state.locations, shifts: state.shifts, payroll: state.payroll };
   try {
     const { data, error } = await db.rpc('save_roster_state', {
       p_state: payload,
@@ -498,5 +504,26 @@ async function initialise() {
     if (event === 'SIGNED_OUT') showLogin();
   });
 }
+
+window.rosterApp = {
+  get state() { return state; },
+  set state(value) { state = value; },
+  get selectedWeek() { return selectedWeek; },
+  set selectedWeek(value) { selectedWeek = value; },
+  save,
+  render,
+  toast,
+  mondayOf,
+  weekEnd,
+  weekLabel,
+  isoDate,
+  parseDate,
+  shiftsForWeek,
+  shiftsForOutletWeek,
+  shiftHours,
+  fillSelect,
+  setConnection,
+  editorName
+};
 
 initialise();
