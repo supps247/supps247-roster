@@ -2,7 +2,7 @@
 
 create table if not exists public.roster_state (
   id integer primary key check (id = 1),
-  state jsonb not null default '{"employees":[],"locations":[],"shifts":[]}'::jsonb,
+  state jsonb not null default '{"employees":[],"locations":[],"shifts":[],"payroll":{"defaultHourlyRate":25,"overtimeThresholdHours":38,"overtimeMultiplier":1.5,"employeeRates":{}}}'::jsonb,
   revision bigint not null default 0,
   updated_at timestamptz not null default now(),
   updated_by text not null default 'system'
@@ -14,7 +14,13 @@ values (
   jsonb_build_object(
     'employees', jsonb_build_array('Sebastian','Ash','Dhillon','Roy','Ainsley','Anthony','Sash','Vishesh','Lokesh','Sahil','Rahul','Harinder','Sumit','Lochlan','Anikin','Vicky','Joel','Moni','Jashan'),
     'locations', jsonb_build_array('Springvale (Head Office)','Dandenong','Point Cook','Caroline Springs','Tarneit','Manor Lakes','Craigieburn','Reservoir','South Yarra (Chapel Street)','Ringwood','Chirnside Park'),
-    'shifts', '[]'::jsonb
+    'shifts', '[]'::jsonb,
+    'payroll', jsonb_build_object(
+      'defaultHourlyRate', 25,
+      'overtimeThresholdHours', 38,
+      'overtimeMultiplier', 1.5,
+      'employeeRates', '{}'::jsonb
+    )
   ),
   0,
   'system'
