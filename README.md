@@ -28,3 +28,21 @@ The Accounts tab imports receiving files, organises records by outlet and suppli
 ## Prepaid suppliers
 
 The app automatically marks these suppliers as **Prepaid** on existing records and future receiving-file imports: iHerbs, PHD, Tiger Nutrition, EHP, Amazon, Innovative Nutrition, Switch Nutrition, Legit Supps, Muscle & Strength, INB4, and LVL Up Health. Prepaid records are excluded from outstanding and overdue totals. Admins can still manually change the status when an exception occurs.
+
+
+## Accounts workbook import
+The app now includes records imported from `data.xlsx` (894 invoice/account rows), including supplier, outlet, invoice number, received date, due date, amount, paid status and receipt number where supplied. Existing cloud edits are merged and preserved.
+
+
+## Supplier PDF invoice import
+Accounts now includes **Upload supplier PDF**. The browser extracts text from text-based PDFs, pre-fills supplier, invoice number, invoice date, due date, outlet and total amount, and opens an editable review form before saving. Scanned/image-only PDFs require manual entry because this version does not use OCR. Always verify extracted values before saving.
+
+
+## Accounts data update
+Imported 975 rows from the latest accounts file. 892 matched existing records and were updated; 83 were added. Paid status and receipt numbers are preserved.
+
+
+## Bulk payment editing
+Select multiple filtered invoices and update status, paid date, and receipt/reference together. Payment status and paid date can also be changed directly in each table row.
+
+- Due payment status is available for individual and bulk invoice updates.

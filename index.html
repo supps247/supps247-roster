@@ -91,17 +91,18 @@
         <div class="card stat"><span>Paid</span><strong id="accPaid">$0.00</strong></div>
       </div>
       <div class="card">
-        <div class="section-head wrap"><div><div class="eyebrow">SUPPLIER ACCOUNTS</div><h2>Invoices & receiving</h2><p class="muted">Track every received order by supplier and outlet, then correct invoice details and payment status.</p></div><button id="addInvoiceBtn" class="btn primary">+ Add invoice</button></div>
+        <div class="section-head wrap"><div><div class="eyebrow">SUPPLIER ACCOUNTS</div><h2>Invoices & receiving</h2><p class="muted">Track every received order by supplier and outlet, then correct invoice details and payment status.</p></div><div class="section-actions"><button id="uploadInvoicePdfBtn" class="btn primary">Upload supplier PDF</button><input id="invoicePdfInput" type="file" accept="application/pdf,.pdf" class="hidden"><button id="addInvoiceBtn" class="btn secondary">+ Add manually</button></div></div>
         <div class="toolbar accounts-toolbar">
           <label>Outlet<select id="accountsOutletFilter"></select></label>
           <label>Supplier<select id="accountsSupplierFilter"></select></label>
-          <label>Payment status<select id="accountsStatusFilter"><option>All statuses</option><option>Unconfirmed</option><option>Unpaid</option><option>Scheduled</option><option>Part paid</option><option>Prepaid</option><option>Paid</option><option>Disputed</option><option>Credit received</option><option>Internal transfer</option><option>No payment required</option></select></label>
+          <label>Payment status<select id="accountsStatusFilter"><option>All statuses</option><option>Unconfirmed</option><option>Unpaid</option><option>Due</option><option>Scheduled</option><option>Part paid</option><option>Prepaid</option><option>Paid</option><option>Disputed</option><option>Credit received</option><option>Internal transfer</option><option>No payment required</option></select></label>
           <label>Search<input id="accountsSearch" placeholder="Invoice or supplier"></label>
           <button id="importReceivingBtn" class="btn secondary">Import receiving file</button>
           <input id="receivingFileInput" type="file" accept=".txt,.csv" class="hidden">
           <button id="exportAccountsBtn" class="btn secondary">Export CSV</button>
         </div>
-        <div class="table-wrap"><table><thead><tr><th>Invoice</th><th>Supplier</th><th>Outlet</th><th>Received</th><th>Due</th><th>Qty</th><th>Amount</th><th>Payment</th><th>Paid date</th><th></th></tr></thead><tbody id="accountsBody"></tbody></table></div>
+        <div class="bulk-payment-bar"><strong><span id="accountsSelectedCount">0</span> selected</strong><label>Status<select id="bulkPaymentStatus"><option value="">Keep current</option><option>Unconfirmed</option><option>Unpaid</option><option>Due</option><option>Scheduled</option><option>Part paid</option><option>Prepaid</option><option>Paid</option><option>Disputed</option><option>Credit received</option><option>Internal transfer</option><option>No payment required</option></select></label><label>Paid date<input id="bulkPaidDate" type="date"></label><label>Receipt / reference<input id="bulkReceiptNumber" placeholder="Optional"></label><button id="applyBulkPaymentBtn" class="btn primary">Update selected payments</button><button id="clearAccountSelectionBtn" class="btn secondary">Clear selection</button></div>
+        <div class="table-wrap"><table><thead><tr><th><input id="selectAllAccounts" type="checkbox" title="Select all filtered invoices"></th><th>Invoice</th><th>Supplier</th><th>Outlet</th><th>Received</th><th>Due</th><th>Qty</th><th>Amount</th><th>Payment</th><th>Paid date</th><th>Receipt</th><th></th></tr></thead><tbody id="accountsBody"></tbody><tfoot><tr class="accounts-total-row"><td></td><td colspan="5"><strong>Filtered total</strong> <span id="accountsFilteredCount" class="muted"></span></td><td id="accountsFilteredQty">0</td><td id="accountsFilteredTotal">$0.00</td><td colspan="4"></td></tr></tfoot></table></div>
       </div>
     </section>
   </section>
@@ -144,14 +145,14 @@
     <label>Due date<input id="invoiceDueDate" type="date"></label>
     <label>Total quantity<input id="invoiceQuantity" type="number" min="0" step="1"></label>
     <label>Invoice amount ($)<input id="invoiceAmount" type="number" min="0" step="0.01" required></label>
-    <label>Payment status<select id="invoicePaymentStatus"><option>Unconfirmed</option><option>Unpaid</option><option>Scheduled</option><option>Part paid</option><option>Prepaid</option><option>Paid</option><option>Disputed</option><option>Credit received</option><option>Internal transfer</option><option>No payment required</option></select></label>
+    <label>Payment status<select id="invoicePaymentStatus"><option>Unconfirmed</option><option>Unpaid</option><option>Due</option><option>Scheduled</option><option>Part paid</option><option>Prepaid</option><option>Paid</option><option>Disputed</option><option>Credit received</option><option>Internal transfer</option><option>No payment required</option></select></label>
     <label>Paid date<input id="invoicePaidDate" type="date"></label>
-    <label>Payment reference<input id="invoicePaymentReference"></label>
-    <label class="full">Notes<textarea id="invoiceNotes" rows="3"></textarea></label>
+    <label>Receipt number<input id="invoiceReceiptNumber"></label><label>Payment reference<input id="invoicePaymentReference"></label>
+    <label class="full">Notes<textarea id="invoiceNotes" rows="3"></textarea></label><div id="pdfImportStatus" class="full pdf-import-status hidden"></div><input id="invoiceSourceFile" type="hidden">
   </div>
   <div class="dialog-actions"><button type="button" class="btn secondary" data-close="invoiceDialog">Cancel</button><button class="btn primary" type="submit">Save invoice</button></div>
 </form></dialog>
 
 <div id="toast" class="toast hidden"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs" type="module"></script><script src="app.js"></script>
 </body></html>
