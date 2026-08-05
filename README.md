@@ -46,3 +46,7 @@ Imported 975 rows from the latest accounts file. 892 matched existing records an
 Select multiple filtered invoices and update status, paid date, and receipt/reference together. Payment status and paid date can also be changed directly in each table row.
 
 - Due payment status is available for individual and bulk invoice updates.
+
+
+## Save troubleshooting
+This build refreshes expired Supabase sessions automatically, sanitises state before JSONB saving, retries token failures once, and shows the actual Supabase error message instead of a generic save failure. If saving still fails, sign out and sign back in, then run `setup.sql` again in Supabase SQL Editor to ensure the save function exists.
