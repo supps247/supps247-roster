@@ -91,7 +91,7 @@
         <div class="card stat"><span>Paid</span><strong id="accPaid">$0.00</strong></div>
       </div>
       <div class="card">
-        <div class="section-head wrap"><div><div class="eyebrow">SUPPLIER ACCOUNTS</div><h2>Invoices & receiving</h2><p class="muted">Track every received order by supplier and outlet, then correct invoice details and payment status.</p></div><div class="section-actions"><button id="uploadInvoicePdfBtn" class="btn primary">Upload supplier PDF</button><input id="invoicePdfInput" type="file" accept="application/pdf,.pdf" class="hidden"><button id="addInvoiceBtn" class="btn secondary">+ Add manually</button></div></div>
+        <div class="section-head wrap"><div><div class="eyebrow">SUPPLIER ACCOUNTS</div><h2>Invoices & receiving</h2><p class="muted">Track every received order by supplier and outlet, then correct invoice details and payment status.</p></div><div class="section-actions"><button id="uploadStatementBtn" class="btn primary">Upload supplier statement</button><input id="statementFileInput" type="file" accept=".pdf,.csv,.xlsx,.xls,application/pdf,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" class="hidden"><button id="uploadInvoicePdfBtn" class="btn secondary">Upload supplier invoice PDF</button><input id="invoicePdfInput" type="file" accept="application/pdf,.pdf" class="hidden"><button id="addInvoiceBtn" class="btn secondary">+ Add manually</button></div></div>
         <div class="toolbar accounts-toolbar">
           <label>Outlet<select id="accountsOutletFilter"></select></label>
           <label>Supplier<select id="accountsSupplierFilter"></select></label>
@@ -107,6 +107,27 @@
     </section>
   </section>
 </main>
+
+<dialog id="statementDialog" class="wide-dialog"><form id="statementForm" class="dialog-card statement-dialog-card">
+  <div class="section-head wrap"><div><div class="eyebrow">STATEMENT RECONCILIATION</div><h2>Review supplier statement</h2><p id="statementFileLabel" class="muted"></p></div><button type="button" class="icon" data-close="statementDialog">×</button></div>
+  <div class="form-grid statement-settings">
+    <label>Supplier<input id="statementSupplier" required list="supplierList"></label>
+    <label>Outlet<input id="statementOutlet" required list="outletList"></label>
+    <label>Statement date<input id="statementDate" type="date"></label>
+    <label>Status for new invoices<select id="statementNewStatus"><option>Due</option><option>Unconfirmed</option><option>Unpaid</option><option>Scheduled</option><option>Prepaid</option><option>Paid</option></select></label>
+  </div>
+  <div class="statement-summary">
+    <div class="mini-card"><span>Statement rows</span><strong id="statementRowCount">0</strong></div>
+    <div class="mini-card"><span>Matched</span><strong id="statementMatchedCount">0</strong></div>
+    <div class="mini-card"><span>Missing</span><strong id="statementMissingCount">0</strong></div>
+    <div class="mini-card"><span>Mismatches</span><strong id="statementMismatchCount">0</strong></div>
+    <div class="mini-card"><span>Statement total</span><strong id="statementTotal">$0.00</strong></div>
+    <div class="mini-card"><span>Missing total</span><strong id="statementMissingTotal">$0.00</strong></div>
+  </div>
+  <div class="table-wrap statement-preview"><table><thead><tr><th>Add</th><th>Invoice</th><th>Date</th><th>Due date</th><th>Amount</th><th>Result</th></tr></thead><tbody id="statementPreviewBody"></tbody></table></div>
+  <p id="statementMessage" class="notice">Check the supplier and outlet, then add only the missing invoices.</p>
+  <div class="dialog-actions"><button type="button" class="btn secondary" data-close="statementDialog">Cancel</button><button id="addMissingStatementInvoicesBtn" class="btn primary" type="submit">Add selected missing invoices</button></div>
+</form></dialog>
 
 <dialog id="shiftDialog"><form id="shiftForm" class="dialog-card">
   <div class="section-head"><h2 id="shiftDialogTitle">Add shift</h2><button type="button" class="icon" data-close="shiftDialog">×</button></div>

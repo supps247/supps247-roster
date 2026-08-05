@@ -50,3 +50,8 @@ Select multiple filtered invoices and update status, paid date, and receipt/refe
 
 ## Save troubleshooting
 This build refreshes expired Supabase sessions automatically, sanitises state before JSONB saving, retries token failures once, and shows the actual Supabase error message instead of a generic save failure. If saving still fails, sign out and sign back in, then run `setup.sql` again in Supabase SQL Editor to ensure the save function exists.
+
+
+## Supplier statement reconciliation
+
+In **Accounts**, use **Upload supplier statement** to import PDF, CSV, XLSX or XLS files. Choose the supplier and outlet, then review matched, missing and mismatched invoices. The app adds only selected missing invoices, prevents duplicate invoice numbers for the same supplier/outlet, and records the source statement filename. PDF detection works best with text-based supplier statements; scanned statements may require Excel/CSV or manual entry.
