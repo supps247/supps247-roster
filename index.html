@@ -1,284 +1,157 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Supps247 Roster Admin</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Supps247 Roster & Payroll</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="bg-orb orb-a"></div>
-  <div class="bg-orb orb-b"></div>
-  <header class="topbar">
-    <div>
-      <div class="brand">SUPPS247</div>
-      <div class="subbrand">Roster Admin</div>
-    </div>
-    <div class="header-status">
-      <span id="connectionStatus" class="sync-status offline">Sign in required</span>
-      <button id="logoutBtn" class="ghost compact hidden">Log out</button>
-      <span class="admin-badge">ADMIN ONLY</span>
-    </div>
-  </header>
+<header class="topbar">
+  <div><div class="brand">SUPPS247</div><div class="subbrand">Roster & Payroll Admin</div></div>
+  <div class="header-actions"><span id="connectionStatus" class="status offline">Sign in required</span><button id="logoutBtn" class="btn secondary hidden">Log out</button></div>
+</header>
+<main class="shell">
+  <section id="loginView" class="card login-card">
+    <div class="eyebrow">SECURE CLOUD ACCESS</div><h1>Sign in</h1>
+    <p class="muted">Use your Supabase email and password.</p>
+    <form id="loginForm" class="form-grid one">
+      <label>Email<input id="loginEmail" type="email" required></label>
+      <label>Password<input id="loginPassword" type="password" required></label>
+      <button class="btn primary" type="submit">Sign in</button>
+    </form><p id="loginError" class="error hidden"></p>
+  </section>
 
-  <main class="container">
-    <section class="hero card">
-      <div>
-        <p class="eyebrow">WORKS WITH SUPABASE</p>
-        <h1>Plan weekly shifts with less friction.</h1>
-        <p class="hero-copy">A clean roster workspace for managers and accountants: secure login, weekly planning, outlet batches, payroll summaries, exports, and live sync.</p>
-      </div>
-      <div class="hero-panel">
-        <div class="mini-stat"><span>Today</span><strong id="heroToday">0</strong></div>
-        <div class="mini-stat"><span>This week</span><strong id="heroWeek">0</strong></div>
-        <div class="mini-stat"><span>Outlets</span><strong id="heroOutlets">0</strong></div>
-      </div>
-    </section>
+  <section id="appView" class="hidden">
+    <nav class="tabs">
+      <button class="tab active" data-view="dashboard">Dashboard</button>
+      <button class="tab" data-view="roster">Roster</button>
+      <button class="tab" data-view="employees">Employees</button>
+      <button class="tab" data-view="stores">Stores & Hours</button>
+      <button class="tab" data-view="payroll">Payroll</button>
+      <button class="tab" data-view="accounts">Accounts</button>
+    </nav>
 
-    <section id="loginView" class="card auth-card">
-      <p class="eyebrow">SECURE CLOUD ACCESS</p>
-      <h2>Sign in to Supps247 Roster</h2>
-      <p class="muted">Use the email and password created in Supabase Authentication.</p>
-      <form id="loginForm" class="form-grid auth-form">
-        <label class="full">Email<input id="loginEmail" type="email" required autocomplete="email" /></label>
-        <label class="full">Password<input id="loginPassword" type="password" required autocomplete="current-password" /></label>
-        <button class="primary full" type="submit">Sign in</button>
-      </form>
-      <p id="loginError" class="error-text hidden"></p>
-    </section>
-
-    <section id="managerView" class="hidden">
+    <section id="dashboardView" class="view">
       <div class="stats-grid">
-        <div class="stat card"><span>Rostered today</span><strong id="rosteredToday">0</strong></div>
-        <div class="stat card"><span>Active outlets today</span><strong id="activeOutlets">0</strong></div>
-        <div class="stat card"><span>Shifts this week</span><strong id="weeklyShifts">0</strong></div>
-        <div class="stat card"><span>Roster hours</span><strong id="managerHours">0.0</strong></div>
+        <div class="card stat"><span>Employees</span><strong id="statEmployees">0</strong></div>
+        <div class="card stat"><span>Outlets</span><strong id="statOutlets">0</strong></div>
+        <div class="card stat"><span>Roster hours</span><strong id="statHours">0.0</strong></div>
+        <div class="card stat"><span>Estimated payroll</span><strong id="statPayroll">$0.00</strong></div>
       </div>
+      <div class="card"><div class="section-head"><div><div class="eyebrow">THIS WEEK</div><h2>Outlet labour summary</h2></div></div><div id="outletSummary" class="summary-grid"></div></div>
+    </section>
 
+    <section id="rosterView" class="view hidden">
       <div class="card">
-        <div class="section-title wrap">
-          <div>
-            <p class="eyebrow">ROSTER BUILDER</p>
-            <h2>Create weekly rosters</h2>
-          </div>
-          <div class="week-controls">
-            <button id="prevWeek" class="ghost compact">←</button>
-            <span id="managerWeekLabel" class="pill"></span>
-            <button id="nextWeek" class="ghost compact">→</button>
-          </div>
+        <div class="section-head wrap"><div><div class="eyebrow">ROSTER</div><h2>Weekly roster</h2></div><div class="week-nav"><button id="prevWeek" class="btn secondary">←</button><span id="weekLabel" class="pill"></span><button id="nextWeek" class="btn secondary">→</button></div></div>
+        <div class="toolbar">
+          <label>Outlet<select id="rosterOutletFilter"></select></label>
+          <label>Employee<select id="rosterEmployeeFilter"></select></label>
+          <button id="addShiftBtn" class="btn primary">+ Add shift</button>
+          <button id="weeklyRosterBtn" class="btn primary">Build weekly roster</button>
+          <button id="copyWeekBtn" class="btn secondary">Copy previous week</button>
+          <button id="exportRosterBtn" class="btn secondary">Export CSV</button>
         </div>
-
-        <div class="roster-toolbar">
-          <label>
-            Employee
-            <select id="employeeFilter"></select>
-          </label>
-          <button id="copyWeek" class="secondary compact">Copy previous week</button>
-          <button id="clearWeek" class="danger compact">Clear week</button>
-          <button id="bulkRoster" class="secondary compact">Outlet weekly roster</button>
-          <button id="addShift" class="primary compact">+ Add shift</button>
-          <button id="exportRoster" class="secondary compact">Export roster CSV</button>
-          <button id="downloadBackup" class="secondary compact">Download JSON backup</button>
-        </div>
-
-        <div class="table-wrap">
-          <table class="roster-table">
-            <thead>
-              <tr>
-                <th>Day</th><th>Employee</th><th>Location</th><th>Start</th><th>Finish</th><th>Break</th><th>Hours</th><th></th>
-              </tr>
-            </thead>
-            <tbody id="rosterTableBody"></tbody>
-          </table>
-        </div>
-        <p class="muted small-note">Roster data is saved securely in Supabase and updates live on every connected computer.</p>
-      </div>
-
-      <div class="card">
-        <div class="section-title wrap">
-          <div>
-            <p class="eyebrow">OUTLET VIEW</p>
-            <h2>Week roster by outlet</h2>
-          </div>
-          <p class="muted small-note">Each outlet shows the whole week in one place.</p>
-        </div>
-        <div class="table-wrap">
-          <table class="outlet-table">
-            <thead>
-              <tr>
-                <th>Outlet</th>
-                <th>Mon</th>
-                <th>Tue</th>
-                <th>Wed</th>
-                <th>Thu</th>
-                <th>Fri</th>
-                <th>Sat</th>
-                <th>Sun</th>
-                <th>Total</th>
-              </tr>
-            </thead>
-            <tbody id="outletRosterBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="grid two">
-        <div class="card">
-          <div class="section-title">
-            <div>
-              <p class="eyebrow">TODAY</p>
-              <h2>Today’s roster</h2>
-            </div>
-          </div>
-          <div id="teamList" class="team-list"></div>
-        </div>
-        <div class="card">
-          <div class="section-title">
-            <div>
-              <p class="eyebrow">SETUP</p>
-              <h2>Supabase status</h2>
-            </div>
-          </div>
-          <div class="setup-box">
-            <p class="muted">If the database has not been initialised yet, run <code>setup.sql</code> in the Supabase SQL editor.</p>
-            <ul class="setup-list">
-              <li>Auth users sign in with email and password.</li>
-              <li>Live sync uses the <code>roster_state</code> table.</li>
-              <li>Payroll summaries and rates live in the same roster state.</li>
-              <li>Only authenticated users can read and save state.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div class="card payroll-card">
-        <div class="section-title wrap">
-          <div>
-            <p class="eyebrow">PAYROLL</p>
-            <h2>Payroll summary</h2>
-          </div>
-          <div class="payroll-actions">
-            <span id="payrollPeriodLabel" class="pill"></span>
-            <button id="payrollUseRosterWeek" class="secondary compact">Use roster week</button>
-            <button id="resetPayrollOverrides" class="ghost compact">Reset overrides</button>
-            <button id="exportPayroll" class="secondary compact">Export payroll CSV</button>
-          </div>
-        </div>
-
-        <div class="payroll-controls">
-          <label>From<input id="payrollStart" type="date" /></label>
-          <label>To<input id="payrollEnd" type="date" /></label>
-          <label>Default rate (AUD/hr)<input id="payrollDefaultRate" type="number" min="0" step="0.01" /></label>
-          <label>OT threshold (hours)<input id="payrollThreshold" type="number" min="0" step="0.5" /></label>
-          <label>OT multiplier<input id="payrollMultiplier" type="number" min="1" step="0.1" /></label>
-        </div>
-
-        <div class="stats-grid payroll-stats">
-          <div class="stat card"><span>People paid</span><strong id="payrollPeople">0</strong></div>
-          <div class="stat card"><span>Pay hours</span><strong id="payrollHours">0.0</strong></div>
-          <div class="stat card"><span>Overtime hours</span><strong id="payrollOvertime">0.0</strong></div>
-          <div class="stat card"><span>Gross payroll</span><strong id="payrollGross">$0.00</strong></div>
-        </div>
-
-        <div class="payroll-layout">
-          <div class="table-wrap">
-            <table class="payroll-table">
-              <thead>
-                <tr>
-                  <th>Employee</th>
-                  <th>Shifts</th>
-                  <th>Hours</th>
-                  <th>OT Hours</th>
-                  <th>Rate</th>
-                  <th>Gross</th>
-                  <th>Locations</th>
-                </tr>
-              </thead>
-              <tbody id="payrollTableBody"></tbody>
-            </table>
-          </div>
-
-          <div class="payroll-panel">
-            <div class="section-title">
-              <div>
-                <p class="eyebrow">RATES</p>
-                <h3>Employee rates</h3>
-              </div>
-            </div>
-            <p class="muted small-note">Clear a rate to fall back to the default hourly rate.</p>
-            <div class="table-wrap rate-wrap">
-              <table class="rates-table">
-                <thead>
-                  <tr>
-                    <th>Employee</th>
-                    <th>Rate</th>
-                  </tr>
-                </thead>
-                <tbody id="payrollRatesBody"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+        <div class="table-wrap"><table><thead><tr><th>Date</th><th>Employee</th><th>Outlet</th><th>Time</th><th>Break</th><th>Paid hours</th><th>Type</th><th></th></tr></thead><tbody id="rosterBody"></tbody></table></div>
       </div>
     </section>
-  </main>
 
-  <dialog id="shiftDialog">
-    <form id="shiftForm" method="dialog" class="dialog-card">
-      <div class="section-title">
-        <h2 id="dialogTitle">Add shift</h2>
-        <button type="button" id="closeDialog" class="ghost compact">✕</button>
+    <section id="employeesView" class="view hidden">
+      <div class="card">
+        <div class="section-head"><div><div class="eyebrow">EMPLOYEES</div><h2>Pay settings</h2></div><button id="addEmployeeBtn" class="btn primary">+ Add employee</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Name</th><th>Home outlet</th><th>Employment</th><th>Base rate</th><th>Sat</th><th>Sun</th><th>Public holiday</th><th>Super</th><th></th></tr></thead><tbody id="employeesBody"></tbody></table></div>
       </div>
-      <input type="hidden" id="shiftId" />
-      <div class="form-grid">
-        <label>Employee<select id="shiftEmployee" required></select></label>
-        <label>Date<input id="shiftDate" type="date" required /></label>
-        <label>Location<select id="shiftLocation" required></select></label>
-        <label>Start time<input id="shiftStart" type="time" required value="09:00" /></label>
-        <label>Finish time<input id="shiftEnd" type="time" required value="17:00" /></label>
-        <label>Unpaid break (minutes)<input id="shiftBreak" type="number" min="0" step="5" value="30" /></label>
-        <label class="full">Notes<input id="shiftNotes" type="text" placeholder="Optional" /></label>
-      </div>
-      <div class="dialog-actions">
-        <button type="button" id="cancelDialog" class="secondary">Cancel</button>
-        <button type="submit" class="primary">Save shift</button>
-      </div>
-    </form>
-  </dialog>
+    </section>
 
-  <dialog id="bulkRosterDialog" class="wide-dialog">
-    <form id="bulkRosterForm" method="dialog" class="dialog-card">
-      <div class="section-title">
-        <div>
-          <p class="eyebrow">OUTLET WEEKLY ROSTER</p>
-          <h2>Add a full outlet roster in one go</h2>
+
+    <section id="storesView" class="view hidden">
+      <div class="card">
+        <div class="section-head wrap"><div><div class="eyebrow">STORE DIRECTORY</div><h2>Outlet details & opening hours</h2><p id="storesVerified" class="muted"></p></div></div>
+        <div id="storesGrid" class="stores-grid"></div>
+        <p class="notice">Store hours can change for public holidays, shopping-centre trading days or special events. Confirm exceptional dates with the outlet before publishing a roster.</p>
+      </div>
+    </section>
+
+    <section id="payrollView" class="view hidden">
+      <div class="card">
+        <div class="section-head wrap"><div><div class="eyebrow">PAYROLL</div><h2>Weekly payroll estimate</h2></div><div class="week-nav"><button id="payPrevWeek" class="btn secondary">←</button><span id="payWeekLabel" class="pill"></span><button id="payNextWeek" class="btn secondary">→</button></div></div>
+        <div class="toolbar"><label>Outlet<select id="payrollOutletFilter"></select></label><button id="exportPayrollBtn" class="btn primary">Export payroll CSV</button></div>
+        <div class="pay-cards"><div class="mini-card"><span>Gross wages</span><strong id="grossTotal">$0.00</strong></div><div class="mini-card"><span>Super</span><strong id="superTotal">$0.00</strong></div><div class="mini-card"><span>Allowances</span><strong id="allowanceTotal">$0.00</strong></div><div class="mini-card"><span>Total labour cost</span><strong id="labourTotal">$0.00</strong></div></div>
+        <div class="table-wrap"><table><thead><tr><th>Employee</th><th>Weekday hrs</th><th>Sat hrs</th><th>Sun hrs</th><th>PH hrs</th><th>Gross</th><th>Super</th><th>Allowance</th><th>Total cost</th></tr></thead><tbody id="payrollBody"></tbody></table></div>
+        <p class="notice">Payroll figures are estimates based on rostered hours and saved rates. Confirm awards, overtime, tax, leave, and payroll compliance with your accountant before paying staff.</p>
+      </div>
+    </section>
+
+    <section id="accountsView" class="view hidden">
+      <div class="stats-grid accounts-stats">
+        <div class="card stat"><span>Outstanding</span><strong id="accOutstanding">$0.00</strong></div>
+        <div class="card stat"><span>Overdue</span><strong id="accOverdue">0</strong></div>
+        <div class="card stat"><span>Due in 7 days</span><strong id="accDueSoon">0</strong></div>
+        <div class="card stat"><span>Paid</span><strong id="accPaid">$0.00</strong></div>
+      </div>
+      <div class="card">
+        <div class="section-head wrap"><div><div class="eyebrow">SUPPLIER ACCOUNTS</div><h2>Invoices & receiving</h2><p class="muted">Track every received order by supplier and outlet, then correct invoice details and payment status.</p></div><button id="addInvoiceBtn" class="btn primary">+ Add invoice</button></div>
+        <div class="toolbar accounts-toolbar">
+          <label>Outlet<select id="accountsOutletFilter"></select></label>
+          <label>Supplier<select id="accountsSupplierFilter"></select></label>
+          <label>Payment status<select id="accountsStatusFilter"><option>All statuses</option><option>Unconfirmed</option><option>Unpaid</option><option>Scheduled</option><option>Part paid</option><option>Prepaid</option><option>Paid</option><option>Disputed</option><option>Credit received</option><option>Internal transfer</option><option>No payment required</option></select></label>
+          <label>Search<input id="accountsSearch" placeholder="Invoice or supplier"></label>
+          <button id="importReceivingBtn" class="btn secondary">Import receiving file</button>
+          <input id="receivingFileInput" type="file" accept=".txt,.csv" class="hidden">
+          <button id="exportAccountsBtn" class="btn secondary">Export CSV</button>
         </div>
-        <button type="button" id="closeBulkDialog" class="ghost compact">✕</button>
+        <div class="table-wrap"><table><thead><tr><th>Invoice</th><th>Supplier</th><th>Outlet</th><th>Received</th><th>Due</th><th>Qty</th><th>Amount</th><th>Payment</th><th>Paid date</th><th></th></tr></thead><tbody id="accountsBody"></tbody></table></div>
       </div>
-      <div class="bulk-header">
-        <label>Outlet<select id="bulkLocation" required></select></label>
-        <label>Week starting<input id="bulkWeek" type="date" required /></label>
-      </div>
-      <p class="muted small-note">Set each day separately. An employee can work a half day on one day and a full day on another. Multiple employees can also work at the same outlet on the same day.</p>
-      <div class="table-wrap bulk-wrap">
-        <table class="bulk-table">
-          <thead><tr><th>Employee</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr></thead>
-          <tbody id="bulkRosterBody"></tbody>
-        </table>
-      </div>
-      <div class="dialog-actions">
-        <button type="button" id="cancelBulkDialog" class="secondary">Cancel</button>
-        <button type="submit" class="primary">Save outlet roster</button>
-      </div>
-    </form>
-  </dialog>
+    </section>
+  </section>
+</main>
 
-  <div id="toast" class="toast hidden"></div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app.js"></script>
-  <script src="payroll.js"></script>
-</body>
-</html>
+<dialog id="shiftDialog"><form id="shiftForm" class="dialog-card">
+  <div class="section-head"><h2 id="shiftDialogTitle">Add shift</h2><button type="button" class="icon" data-close="shiftDialog">×</button></div>
+  <input id="shiftId" type="hidden">
+  <div class="form-grid"><label>Employee<select id="shiftEmployee" required></select></label><label>Outlet<select id="shiftOutlet" required></select></label><label>Date<input id="shiftDate" type="date" required></label><label>Shift type<select id="shiftType"><option>Custom</option><option>Full day</option><option>Half AM</option><option>Half PM</option></select></label><label>Start<input id="shiftStart" type="time" required></label><label>Finish<input id="shiftEnd" type="time" required></label><div class="full store-hours-box"><span id="storeHoursHint"></span><button id="useStoreHoursBtn" type="button" class="btn secondary small">Use store opening hours</button></div><label>Unpaid break minutes<input id="shiftBreak" type="number" min="0" step="5" value="30"></label><label class="check"><input id="shiftPublicHoliday" type="checkbox"> Public holiday shift</label><label class="full">Notes<input id="shiftNotes" type="text"></label></div>
+  <div class="dialog-actions"><button type="button" class="btn secondary" data-close="shiftDialog">Cancel</button><button class="btn primary" type="submit">Save shift</button></div>
+</form></dialog>
+
+
+<dialog id="weeklyRosterDialog" class="wide-dialog"><form id="weeklyRosterForm" class="dialog-card weekly-dialog-card">
+  <div class="section-head wrap"><div><div class="eyebrow">BULK ROSTER</div><h2>Build outlet weekly roster</h2><p class="muted">Set all employees and all seven days, then save the week in one go.</p></div><button type="button" class="icon" data-close="weeklyRosterDialog">×</button></div>
+  <div class="toolbar weekly-toolbar"><label>Outlet<select id="weeklyRosterOutlet"></select></label><span id="weeklyRosterWeekLabel" class="pill"></span><button id="loadStoreHoursWeekBtn" type="button" class="btn secondary">Fill full-day store hours</button><button id="clearWeeklyGridBtn" type="button" class="btn secondary danger">Clear grid</button></div>
+  <div class="weekly-grid-wrap"><table class="weekly-grid"><thead><tr><th>Employee</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr></thead><tbody id="weeklyRosterBody"></tbody></table></div>
+  <p class="notice">Saving replaces this outlet’s roster for the selected week. Use “Add shift” afterwards for split shifts or a second shift for the same employee on one day.</p>
+  <div class="dialog-actions"><button type="button" class="btn secondary" data-close="weeklyRosterDialog">Cancel</button><button class="btn primary" type="submit">Save whole week</button></div>
+</form></dialog>
+
+<dialog id="employeeDialog"><form id="employeeForm" class="dialog-card">
+  <div class="section-head"><h2 id="employeeDialogTitle">Employee</h2><button type="button" class="icon" data-close="employeeDialog">×</button></div>
+  <input id="employeeOriginalName" type="hidden">
+  <div class="form-grid"><label>Name<input id="employeeName" required></label><label>Home outlet<select id="employeeOutlet"></select></label><label>Employment type<select id="employeeType"><option>Casual</option><option>Part Time</option><option>Full Time</option></select></label><label>Base hourly rate ($)<input id="employeeRate" type="number" min="0" step="0.01" value="30"></label><label>Saturday multiplier<input id="employeeSat" type="number" min="1" step="0.01" value="1.25"></label><label>Sunday multiplier<input id="employeeSun" type="number" min="1" step="0.01" value="1.5"></label><label>Public holiday multiplier<input id="employeePH" type="number" min="1" step="0.01" value="2.5"></label><label>Super rate (%)<input id="employeeSuper" type="number" min="0" step="0.1" value="12"></label><label>Weekly allowance ($)<input id="employeeAllowance" type="number" min="0" step="0.01" value="0"></label></div>
+  <div class="dialog-actions"><button type="button" class="btn secondary" data-close="employeeDialog">Cancel</button><button class="btn primary" type="submit">Save employee</button></div>
+</form></dialog>
+
+
+<dialog id="invoiceDialog"><form id="invoiceForm" class="dialog-card">
+  <div class="section-head"><h2 id="invoiceDialogTitle">Supplier invoice</h2><button type="button" class="icon" data-close="invoiceDialog">×</button></div>
+  <input id="invoiceId" type="hidden">
+  <div class="form-grid">
+    <label>Invoice / order number<input id="invoiceNumber" required></label>
+    <label>Supplier<input id="invoiceSupplier" required list="supplierList"></label>
+    <datalist id="supplierList"></datalist>
+    <label>Outlet<input id="invoiceOutlet" required list="outletList"></label>
+    <datalist id="outletList"></datalist>
+    <label>Received date<input id="invoiceReceivedDate" type="date"></label>
+    <label>Due date<input id="invoiceDueDate" type="date"></label>
+    <label>Total quantity<input id="invoiceQuantity" type="number" min="0" step="1"></label>
+    <label>Invoice amount ($)<input id="invoiceAmount" type="number" min="0" step="0.01" required></label>
+    <label>Payment status<select id="invoicePaymentStatus"><option>Unconfirmed</option><option>Unpaid</option><option>Scheduled</option><option>Part paid</option><option>Prepaid</option><option>Paid</option><option>Disputed</option><option>Credit received</option><option>Internal transfer</option><option>No payment required</option></select></label>
+    <label>Paid date<input id="invoicePaidDate" type="date"></label>
+    <label>Payment reference<input id="invoicePaymentReference"></label>
+    <label class="full">Notes<textarea id="invoiceNotes" rows="3"></textarea></label>
+  </div>
+  <div class="dialog-actions"><button type="button" class="btn secondary" data-close="invoiceDialog">Cancel</button><button class="btn primary" type="submit">Save invoice</button></div>
+</form></dialog>
+
+<div id="toast" class="toast hidden"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js"></script>
+</body></html>

@@ -1,529 +1,104 @@
-const SUPABASE_URL = 'https://wyawmmfggnzjhaqvzmeq.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_u9_uZIJV3zOS3i3MASBubg_wQLPpMP4';
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+const SUPABASE_URL='https://wyawmmfggnzjhaqvzmeq.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_u9_uZIJV3zOS3i3MASBubg_wQLPpMP4';
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const LOCATIONS=['Springvale (Head Office)','Dandenong','Point Cook','Caroline Springs','Tarneit','Manor Lakes','Craigieburn','Reservoir','South Yarra (Chapel Street)','Ringwood','Chirnside Park'];
 
-const SUPPS247_LOCATIONS = [
-  'Springvale (Head Office)', 'Dandenong', 'Point Cook', 'Caroline Springs',
-  'Tarneit', 'Manor Lakes', 'Craigieburn', 'Reservoir',
-  'South Yarra (Chapel Street)', 'Ringwood', 'Chirnside Park'
-];
-const SUPPS247_EMPLOYEES = [
-  'Sebastian', 'Ash', 'Dhillon', 'Roy', 'Ainsley', 'Anthony', 'Sash', 'Vishesh', 'Lokesh',
-  'Sahil', 'Rahul', 'Harinder', 'Sumit', 'Lochlan', 'Anikin', 'Vicky', 'Joel', 'Moni', 'Jashan'
-];
-const defaultState = {
-  revision: 0,
-  updatedAt: null,
-  updatedBy: 'system',
-  employees: SUPPS247_EMPLOYEES,
-  locations: SUPPS247_LOCATIONS,
-  shifts: [],
-  payroll: {
-    defaultHourlyRate: 25,
-    overtimeThresholdHours: 38,
-    overtimeMultiplier: 1.5,
-    employeeRates: {}
-  }
+const STORE_DETAILS={
+  'Springvale (Head Office)':{displayName:'Springvale',address:'Unit 7/308–310 Springvale Rd, Springvale VIC 3171',phone:'0449 748 058',email:'admin@supps247.com.au',hours:[['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['10:00','21:00'],['10:00','21:00']],source:'https://supps247.com.au/pages/supps247-springvale-supplement-store-open-till-9-pm'},
+  'Dandenong':{displayName:'Dandenong',address:'Shop 340 McCrae St, Dandenong VIC 3175',phone:'0494 594 080',email:'admin@supps247.com.au',hours:[['10:00','21:00'],['10:00','21:00'],['10:00','21:00'],['10:00','21:00'],['10:00','21:00'],['10:00','21:00'],['10:00','21:00']],source:'https://supps247.com.au/pages/supps247-dandenong-supplement-store-open-till-8-pm'},
+  'Point Cook':{displayName:'Point Cook',address:'Point Cook Town Centre, Shop 328/2 Main St, Point Cook VIC 3030',phone:'0402 770 098',email:'supps247Pointcook@gmail.com',hours:[['10:00','19:00'],['10:00','19:00'],['10:00','19:00'],['10:00','21:00'],['10:00','21:00'],['10:00','19:00'],['10:00','19:00']],source:'https://supps247.com.au/pages/supps247-point-cook-store'},
+  'Caroline Springs':{displayName:'Caroline Springs',address:'Shop 5/218–222 Caroline Springs Blvd, Caroline Springs VIC 3023',phone:'0452 088 247',email:'admin@supps247.com.au',hours:[['10:00','21:00'],['10:00','21:00'],['10:00','21:00'],['10:00','21:00'],['10:00','21:00'],['10:00','21:00'],['10:00','21:00']],source:'https://supps247.com.au/pages/supplement-store-caroline-springs'},
+  'Tarneit':{displayName:'Tarneit',address:'Tarneit Central Shopping Centre, 540 Derrimut Rd, Tarneit VIC 3029',phone:'0447 020 249',email:'admin@supps247.com.au',hours:[['09:00','20:00'],['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['10:00','20:00'],['10:00','20:00']],source:'https://supps247.com.au/pages/supplement-store-tarneit'},
+  'Manor Lakes':{displayName:'Manor Lakes',address:'455 Ballan Rd, Manor Lakes VIC 3024',phone:'0420 482 807',email:'admin@supps247.com.au',hours:[['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['09:00','21:00']],source:'https://supps247.com.au/pages/store-location/supps247-manor-lakes'},
+  'Craigieburn':{displayName:'Craigieburn',address:'13B/176 Elevation Blvd, Craigieburn VIC 3064',phone:'0411 446 574',email:'admin@supps247.com.au',hours:[['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['09:00','21:00']],source:'https://supps247.com.au/pages/supps247-craigieburn-supplement-store-open-till-9-pm'},
+  'Reservoir':{displayName:'Reservoir',address:'Shop 21A/850 Plenty Rd, Reservoir VIC 3073',phone:'0405 856 819',email:'admin@supps247.com.au',hours:[['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['09:00','21:00']],source:'https://supps247.com.au/pages/store-location/supps247-reservoir'},
+  'South Yarra (Chapel Street)':{displayName:'South Yarra (Chapel Street)',address:'369 Chapel St, South Yarra VIC 3141',phone:'0421 644 307',email:'southyarra@supps247.com.au',hours:[['10:00','20:00'],['10:00','20:00'],['10:00','20:00'],['10:00','20:00'],['10:00','20:00'],['10:00','19:00'],['10:00','19:00']],source:'https://supps247.com.au/pages/supps247-south-yarra-supplement-store-on-chapel-street'},
+  'Ringwood':{displayName:'Ringwood',address:'135 Maroondah Hwy, Ringwood VIC 3134',phone:'0433 866 173',email:'admin@supps247.com.au',hours:[['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['10:00','21:00'],['10:00','21:00']],source:'https://supps247.com.au/pages/supps247-ringwood-supplements-vitamins-performance-fuel-open-till-9pm'},
+  'Chirnside Park':{displayName:'Chirnside Park',address:'L01, 716/239–241 Maroondah Hwy, Chirnside Park VIC 3116',phone:'0426 873 247',email:'admin@supps247.com.au',hours:[['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['09:00','21:00'],['10:00','20:00'],['10:00','20:00']],source:'https://supps247.com.au/pages/supps247-chirnside-park-supplement-store-open-till-9-pm'}
 };
+const STORE_DETAILS_VERIFIED='3 August 2026';
+const DAY_NAMES=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 
-let state = structuredClone(defaultState);
-let saving = false;
-let queuedSave = false;
-let realtimeChannel = null;
-let currentUser = null;
-let selectedWeek = mondayOf(new Date());
+const NAMES=['Sebastian','Ash','Dhillon','Roy','Ainsley','Anthony','Sash','Vishesh','Lokesh','Sahil','Rahul','Harinder','Sumit','Lochlan','Anikin','Vicky','Joel','Moni','Jashan'];
+const baseEmployee=name=>({name,homeOutlet:'Springvale (Head Office)',employmentType:'Casual',baseRate:30,satMultiplier:1.25,sunMultiplier:1.5,publicHolidayMultiplier:2.5,superRate:12,weeklyAllowance:0});
 
-const $ = id => document.getElementById(id);
-const pad = n => String(n).padStart(2, '0');
-const isoDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-const parseDate = s => {
-  const [y, m, d] = s.split('-').map(Number);
-  return new Date(y, m - 1, d);
-};
-const fmtTime = t => new Date(`2000-01-01T${t}`).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-const dayName = d => d.toLocaleDateString([], { weekday: 'short' });
+const PREPAID_SUPPLIER_ALIASES=['IHERBS','IHERB','PHD','PHD ONLINE','TIGER NUTRITION','EHP','EHP LABS','AMAZON','INNOVATIVE','INNOVATIVE NUTRITION','SWITCH','SWITCH NUTRITION','LEGIT','LEGIT SUPPS','LEGIT SUPPS PTY LTD','MUSCLE & STRENGTH','MUSCLE AND STRENGTH','INB4','LVLUP','LVL UP','LVLUP HEALTH','LVL UP HEALTH'];
+function supplierKey(name){return String(name||'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim()}
+function isPrepaidSupplier(name){const key=supplierKey(name);return PREPAID_SUPPLIER_ALIASES.some(alias=>{const a=supplierKey(alias);return key===a||key.startsWith(a+' ')||key.includes(' '+a+' ')})}
+function applySupplierPaymentDefaults(row){if(/^SUPPS247/i.test(String(row.supplier||''))||String(row.supplier||'')==='-')row.paymentStatus='Internal transfer';else if(isPrepaidSupplier(row.supplier)&&['','Unconfirmed','Unpaid'].includes(row.paymentStatus||''))row.paymentStatus='Prepaid';return row}
+const IMPORTED_RECEIVING=[{"id":"recv-1","invoiceNumber":"891738768","supplier":"iherbs","outlet":"South Yarra (Chapel Street)","receivedDate":"Aug 4, 2026","dueDate":"Jul 29, 2026","quantity":41,"amount":783.14,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-2","invoiceNumber":"INV-5251","supplier":"RAPID SUPPLEMENTS","outlet":"Ringwood","receivedDate":"Aug 4, 2026","dueDate":"Aug 4, 2026","quantity":43,"amount":783.3,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-3","invoiceNumber":"CLY-240","supplier":"Amazon","outlet":"Clyde North","receivedDate":"Aug 4, 2026","dueDate":"Aug 3, 2026","quantity":16,"amount":649.0,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-4","invoiceNumber":"LHI-48356","supplier":"LVL UP","outlet":"Springvale (Head Office)","receivedDate":"Aug 4, 2026","dueDate":"Aug 4, 2026","quantity":10,"amount":855.43,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-5","invoiceNumber":"INV-4644 (REMAINING)","supplier":"Legit Supps Pty Ltd","outlet":"Springvale (Head Office)","receivedDate":"Aug 3, 2026","dueDate":"Jul 13, 2026","quantity":12,"amount":494.47,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-6","invoiceNumber":"160018","supplier":"GLOBAL NUTRITION","outlet":"Springvale (Head Office)","receivedDate":"Aug 3, 2026","dueDate":"Sep 14, 2026","quantity":56,"amount":5236.76,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-7","invoiceNumber":"INV-81460","supplier":"Innovative Nutrition","outlet":"Ringwood","receivedDate":"Aug 3, 2026","dueDate":"Aug 3, 2026","quantity":27,"amount":1015.41,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-8","invoiceNumber":"LHI-48338","supplier":"LVL UP","outlet":"Springvale (Head Office)","receivedDate":"Aug 3, 2026","dueDate":"Jul 31, 2026","quantity":14,"amount":735.28,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-9","invoiceNumber":"SUM-130","supplier":"Fibre Boost","outlet":"SummerHill","receivedDate":"Aug 2, 2026","dueDate":"Jul 20, 2026","quantity":168,"amount":297.0,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-10","invoiceNumber":"CLY-238","supplier":"iherbs","outlet":"Clyde North","receivedDate":"Aug 1, 2026","dueDate":"Aug 1, 2026","quantity":22,"amount":510.16,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-11","invoiceNumber":"INV-24650","supplier":"DYNAMIC DISTRIBUTION","outlet":"Ringwood","receivedDate":"Jul 31, 2026","dueDate":"Jul 31, 2026","quantity":14,"amount":367.95,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-12","invoiceNumber":"DAN-78(revised)","supplier":"Glanbia","outlet":"Dandenong","receivedDate":"Jul 30, 2026","dueDate":"Jul 30, 2026","quantity":23,"amount":1596.62,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-13","invoiceNumber":"CRA-395","supplier":"SUPPS247","outlet":"Craigieburn","receivedDate":"Jul 30, 2026","dueDate":"Jul 30, 2026","quantity":2300,"amount":31127.0,"receivingStatus":"Received","paymentStatus":"Internal transfer","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-14","invoiceNumber":"MAI-3619","supplier":"iherbs","outlet":"Springvale (Head Office)","receivedDate":"Jul 30, 2026","dueDate":"Jul 30, 2026","quantity":17,"amount":295.09,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-15","invoiceNumber":"INV-80891","supplier":"Innovative Nutrition","outlet":"Chirnside Park","receivedDate":"Jul 30, 2026","dueDate":"Jul 30, 2026","quantity":30,"amount":800.78,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-16","invoiceNumber":"30460","supplier":"Next Generation","outlet":"Clyde North","receivedDate":"Jul 30, 2026","dueDate":"Sep 30, 2026","quantity":33,"amount":1782.0,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-17","invoiceNumber":"beast labs","supplier":"SUPPS247","outlet":"Craigieburn","receivedDate":"Jul 30, 2026","dueDate":"Jul 30, 2026","quantity":2300,"amount":15950.0,"receivingStatus":"Received","paymentStatus":"Internal transfer","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-18","invoiceNumber":"INV-4722","supplier":"Legit Supps Pty Ltd","outlet":"Ringwood","receivedDate":"Jul 30, 2026","dueDate":"Jul 30, 2026","quantity":45,"amount":1225.89,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-19","invoiceNumber":"INV-4723","supplier":"Legit Supps Pty Ltd","outlet":"Chirnside Park","receivedDate":"Jul 30, 2026","dueDate":"Jul 30, 2026","quantity":54,"amount":1324.65,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-20","invoiceNumber":"SSI246600","supplier":"NUTRITION SYSTEMS","outlet":"Craigieburn","receivedDate":"Jul 30, 2026","dueDate":"Aug 30, 2026","quantity":551,"amount":9284.55,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-21","invoiceNumber":"CRA-391","supplier":"ATP","outlet":"Craigieburn","receivedDate":"Jul 30, 2026","dueDate":"Aug 22, 2026","quantity":24,"amount":754.93,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-22","invoiceNumber":"52593/01","supplier":"SUPERIOR SUPPLEMENTS","outlet":"Craigieburn","receivedDate":"Jul 30, 2026","dueDate":"Jul 28, 2026","quantity":388,"amount":6981.7,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-23","invoiceNumber":"MAI-3618","supplier":"Amazon","outlet":"Springvale (Head Office)","receivedDate":"Jul 30, 2026","dueDate":"Jul 30, 2026","quantity":14,"amount":362.0,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-24","invoiceNumber":"INV - 5250","supplier":"RAPID SUPPLEMENTS","outlet":"Springvale (Head Office)","receivedDate":"Jul 28, 2026","dueDate":"Aug 12, 2026","quantity":26,"amount":669.48,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-25","invoiceNumber":"INV 249820","supplier":"ATP","outlet":"Manor Lakes","receivedDate":"Jul 27, 2026","dueDate":"Jul 27, 2026","quantity":24,"amount":754.8,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-26","invoiceNumber":"IP-RIN135296","supplier":"INTERNATIONAL PROTEIN","outlet":"South Yarra (Chapel Street)","receivedDate":"Jul 27, 2026","dueDate":"Aug 30, 2026","quantity":19,"amount":2712.22,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-27","invoiceNumber":"CLY-230","supplier":"Fibre Boost","outlet":"Clyde North","receivedDate":"Jul 27, 2026","dueDate":"Jul 27, 2026","quantity":288,"amount":792.0,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-28","invoiceNumber":"D577","supplier":"LVL UP","outlet":"Springvale (Head Office)","receivedDate":"Jul 27, 2026","dueDate":"Jul 27, 2026","quantity":10,"amount":800.24,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-29","invoiceNumber":"POI-580","supplier":"ATP","outlet":"Point Cook","receivedDate":"Jul 22, 2026","dueDate":"Jul 22, 2026","quantity":24,"amount":754.93,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-30","invoiceNumber":"3075751","supplier":"GLOBAL NUTRITION","outlet":"SummerHill","receivedDate":"Jul 20, 2026","dueDate":"Jul 20, 2026","quantity":82,"amount":6427.66,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-31","invoiceNumber":"159775","supplier":"GLOBAL NUTRITION","outlet":"Caroline Springs","receivedDate":"Jul 20, 2026","dueDate":"Sep 6, 2026","quantity":100,"amount":8023.49,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-32","invoiceNumber":"891352437","supplier":"iherbs","outlet":"Ringwood","receivedDate":"Jul 20, 2026","dueDate":"Jul 20, 2026","quantity":32,"amount":638.07,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-33","invoiceNumber":"SSI246397","supplier":"NUTRITION SYSTEMS","outlet":"Springvale (Head Office)","receivedDate":"Jul 20, 2026","dueDate":"Jul 24, 2026","quantity":73,"amount":6439.37,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-34","invoiceNumber":"159353","supplier":"GLOBAL NUTRITION","outlet":"Craigieburn","receivedDate":"Jul 19, 2026","dueDate":"Aug 21, 2026","quantity":200,"amount":2200.0,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-35","invoiceNumber":"Order #891147050","supplier":"iherbs","outlet":"Springvale (Head Office)","receivedDate":"Jul 14, 2026","dueDate":"Jul 14, 2026","quantity":13,"amount":297.38,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-36","invoiceNumber":"LHI-46856","supplier":"LVL UP","outlet":"Springvale (Head Office)","receivedDate":"Jul 14, 2026","dueDate":"Jul 14, 2026","quantity":12,"amount":865.48,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-37","invoiceNumber":"INV - 5227","supplier":"RAPID SUPPLEMENTS","outlet":"Springvale (Head Office)","receivedDate":"Jul 14, 2026","dueDate":"Jul 30, 2026","quantity":33,"amount":1051.34,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-38","invoiceNumber":"#891238530","supplier":"iherbs","outlet":"Springvale (Head Office)","receivedDate":"Jul 13, 2026","dueDate":"Jul 13, 2026","quantity":13,"amount":461.26,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-39","invoiceNumber":"INV-5210","supplier":"RAPID SUPPLEMENTS","outlet":"South Yarra (Chapel Street)","receivedDate":"Jul 8, 2026","dueDate":"Jul 24, 2026","quantity":56,"amount":1539.78,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-40","invoiceNumber":"MAI-3582","supplier":"Amazon","outlet":"Springvale (Head Office)","receivedDate":"Jul 8, 2026","dueDate":"Jul 8, 2026","quantity":26,"amount":746.0,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-41","invoiceNumber":"INV-5196","supplier":"RAPID SUPPLEMENTS","outlet":"Chirnside Park","receivedDate":"Jul 8, 2026","dueDate":"Jul 8, 2026","quantity":12,"amount":334.36,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-42","invoiceNumber":"CRA-384","supplier":"GLOBAL NUTRITION","outlet":"Craigieburn","receivedDate":"Jul 6, 2026","dueDate":"Jul 6, 2026","quantity":92,"amount":3995.01,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-43","invoiceNumber":"SSI245639","supplier":"NUTRITION SYSTEMS","outlet":"Springvale (Head Office)","receivedDate":"Jul 3, 2026","dueDate":"Aug 30, 2026","quantity":10,"amount":569.49,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-44","invoiceNumber":"159192","supplier":"GLOBAL NUTRITION","outlet":"Craigieburn","receivedDate":"Jul 3, 2026","dueDate":"Aug 14, 2026","quantity":337,"amount":2992.0,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-45","invoiceNumber":"CAR-51","supplier":"IOVATE","outlet":"Caroline Springs","receivedDate":"Jul 3, 2026","dueDate":"Aug 1, 2026","quantity":112,"amount":4108.02,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-46","invoiceNumber":"Order #890926481","supplier":"iherbs","outlet":"Springvale (Head Office)","receivedDate":"Jul 3, 2026","dueDate":"Jul 3, 2026","quantity":4,"amount":91.36,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-47","invoiceNumber":"SUS-72","supplier":"GLOBAL NUTRITION","outlet":"Chirnside Park","receivedDate":"Jul 3, 2026","dueDate":"Aug 16, 2026","quantity":21,"amount":1601.23,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-48","invoiceNumber":"159259","supplier":"GLOBAL NUTRITION","outlet":"Ringwood","receivedDate":"Jul 3, 2026","dueDate":"Jul 3, 2026","quantity":27,"amount":1336.5,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-49","invoiceNumber":"MAI-3572","supplier":"Amazon","outlet":"Springvale (Head Office)","receivedDate":"Jul 3, 2026","dueDate":"Jul 3, 2026","quantity":10,"amount":440.0,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-50","invoiceNumber":"CIN0009383","supplier":"IOVATE","outlet":"Tarneit","receivedDate":"Jul 3, 2026","dueDate":"Jul 31, 2026","quantity":66,"amount":4829.62,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-51","invoiceNumber":"CIN0009376","supplier":"IOVATE","outlet":"Springvale (Head Office)","receivedDate":"Jul 3, 2026","dueDate":"Jul 3, 2026","quantity":112,"amount":4108.02,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-52","invoiceNumber":"CRA-381","supplier":"Amazon","outlet":"Craigieburn","receivedDate":"Jul 3, 2026","dueDate":"Jul 3, 2026","quantity":4,"amount":420.0,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-53","invoiceNumber":"ML06282026","supplier":"IOVATE","outlet":"Manor Lakes","receivedDate":"Jul 3, 2026","dueDate":"Jul 2, 2026","quantity":56,"amount":4108.6,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-54","invoiceNumber":"CIN0009382","supplier":"IOVATE","outlet":"Ringwood","receivedDate":"Jul 2, 2026","dueDate":"Jul 2, 2026","quantity":56,"amount":4108.02,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-55","invoiceNumber":"CIN0009373","supplier":"IOVATE","outlet":"SummerHill","receivedDate":"Jul 2, 2026","dueDate":"Jul 2, 2026","quantity":72,"amount":2636.04,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-56","invoiceNumber":"CIN0009370","supplier":"IOVATE","outlet":"South Yarra (Chapel Street)","receivedDate":"Jul 2, 2026","dueDate":"Jul 31, 2026","quantity":132,"amount":4829.62,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-57","invoiceNumber":"30408","supplier":"Next Generation","outlet":"Clyde North","receivedDate":"Jun 24, 2026","dueDate":"Aug 30, 2026","quantity":51,"amount":3402.0,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-58","invoiceNumber":"CRA-378","supplier":"iherbs","outlet":"Craigieburn","receivedDate":"Jun 22, 2026","dueDate":"Jun 22, 2026","quantity":18,"amount":428.73,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-59","invoiceNumber":"CRA-377","supplier":"iherbs","outlet":"Craigieburn","receivedDate":"Jun 22, 2026","dueDate":"Jun 22, 2026","quantity":8,"amount":345.04,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"},{"id":"recv-60","invoiceNumber":"158771","supplier":"GLOBAL NUTRITION","outlet":"Tarneit","receivedDate":"Jun 22, 2026","dueDate":"Jul 27, 2026","quantity":8,"amount":1168.16,"receivingStatus":"Received","paymentStatus":"Unconfirmed","paidDate":"","paymentReference":"","notes":"Imported from receiving file dated after 22 June 2026","source":"Receiving import"}];
+const DEFAULT={employees:NAMES.map(baseEmployee),locations:LOCATIONS,shifts:[],accounts:IMPORTED_RECEIVING};
+let state=structuredClone(DEFAULT),revision=0,currentUser=null,currentWeek=startOfWeek(new Date()),payWeek=startOfWeek(new Date()),saving=false,queued=false,channel=null;
+const $=id=>document.getElementById(id); const money=n=>new Intl.NumberFormat('en-AU',{style:'currency',currency:'AUD'}).format(Number(n||0));
+function startOfWeek(d){d=new Date(d);d.setHours(0,0,0,0);const day=d.getDay();d.setDate(d.getDate()-((day+6)%7));return d}
+function dateKey(d){return new Date(d).toISOString().slice(0,10)} function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
+function weekEnd(w){return addDays(w,6)} function inWeek(date,w){const t=new Date(date+'T00:00:00');return t>=w&&t<=weekEnd(w)}
+function weekText(w){return `${addDays(w,0).toLocaleDateString('en-AU',{day:'numeric',month:'short'})} – ${weekEnd(w).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})}`}
+function hours(s){let [sh,sm]=s.start.split(':').map(Number),[eh,em]=s.end.split(':').map(Number);let mins=eh*60+em-(sh*60+sm)-Number(s.breakMinutes||0);if(mins<0)mins+=1440;return Math.max(0,mins/60)}
+function storeDetail(name){return STORE_DETAILS[name]||null}
+function storeHoursFor(name,date){const detail=storeDetail(name);if(!detail||!date)return null;const jsDay=new Date(date+'T00:00:00').getDay();const mondayIndex=(jsDay+6)%7;return detail.hours[mondayIndex]}
+function formatTime(t){const [h,m]=t.split(':').map(Number);return new Date(2000,0,1,h,m).toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}
+function applyStoreHours(){const h=storeHoursFor($('shiftOutlet').value,$('shiftDate').value);if(!h)return;$('shiftStart').value=h[0];$('shiftEnd').value=h[1];$('shiftType').value='Full day';$('shiftBreak').value=30;updateStoreHoursHint()}
+function updateStoreHoursHint(){const detail=storeDetail($('shiftOutlet').value),h=storeHoursFor($('shiftOutlet').value,$('shiftDate').value);if(!detail||!h){$('storeHoursHint').textContent='';return}$('storeHoursHint').textContent=`Store hours: ${formatTime(h[0])} – ${formatTime(h[1])} · ${detail.address}`}
+function outsideStoreHours(row){const h=storeHoursFor(row.location,row.date);return !!h&&(row.start<h[0]||row.end>h[1])}
+function normalize(raw){const employees=(raw.employees||NAMES).map(e=>typeof e==='string'?baseEmployee(e):{...baseEmployee(e.name),...e});const accounts=(Array.isArray(raw.accounts)?raw.accounts:IMPORTED_RECEIVING).map(a=>applySupplierPaymentDefaults({...a}));return{employees,locations:raw.locations?.length?raw.locations:LOCATIONS,shifts:raw.shifts||[],accounts}}
+function setStatus(ok,text){$('connectionStatus').className=`status ${ok?'online':'offline'}`;$('connectionStatus').textContent=text}
+function toast(msg){$('toast').textContent=msg;$('toast').classList.remove('hidden');setTimeout(()=>$('toast').classList.add('hidden'),2500)}
+async function load(){const {data,error}=await db.from('roster_state').select('*').eq('id',1).single();if(error)throw error;state=normalize(data.state||{});revision=Number(data.revision||0)}
+async function save(){if(saving){queued=true;return} saving=true;setStatus(true,'Saving…');try{const {data,error}=await db.rpc('save_roster_state',{p_state:state,p_base_revision:revision,p_updated_by:currentUser?.email||'Admin'});if(error)throw error;const row=Array.isArray(data)?data[0]:data;if(row?.conflict){state=normalize(row.state||{});revision=Number(row.revision||0);toast('Another user updated the app. Latest data loaded.')}else revision=Number(row?.revision||revision+1);setStatus(true,'Cloud synced');render()}catch(e){console.error(e);setStatus(false,'Save failed');toast(e.message||'Save failed')}finally{saving=false;if(queued){queued=false;save()}}}
+function subscribe(){if(channel)db.removeChannel(channel);channel=db.channel('supps247-admin').on('postgres_changes',{event:'UPDATE',schema:'public',table:'roster_state',filter:'id=eq.1'},p=>{if(Number(p.new.revision)>revision){revision=Number(p.new.revision);state=normalize(p.new.state||{});render();toast('Updated from another device')}}).subscribe()}
+function employee(name){return state.employees.find(e=>e.name===name)||baseEmployee(name)}
+function payrollRows(week,outlet='All outlets'){return state.employees.map(emp=>{let weekday=0,sat=0,sun=0,ph=0;state.shifts.filter(s=>s.employee===emp.name&&inWeek(s.date,week)&&(outlet==='All outlets'||s.location===outlet)).forEach(s=>{const h=hours(s);if(s.publicHoliday)ph+=h;else{const d=new Date(s.date+'T00:00:00').getDay();if(d===6)sat+=h;else if(d===0)sun+=h;else weekday+=h}});const gross=weekday*emp.baseRate+sat*emp.baseRate*emp.satMultiplier+sun*emp.baseRate*emp.sunMultiplier+ph*emp.baseRate*emp.publicHolidayMultiplier;const allowance=(weekday+sat+sun+ph)>0?Number(emp.weeklyAllowance||0):0;const superAmt=gross*Number(emp.superRate||0)/100;return{emp,weekday,sat,sun,ph,gross,allowance,superAmt,total:gross+allowance+superAmt}}).filter(r=>r.weekday+r.sat+r.sun+r.ph>0)}
 
-function mondayOf(date) {
-  const d = new Date(date);
-  d.setHours(0, 0, 0, 0);
-  const day = d.getDay() || 7;
-  d.setDate(d.getDate() - day + 1);
-  return d;
+function weeklyCellShift(employeeName,dayIndex,outlet){const date=dateKey(addDays(currentWeek,dayIndex));return state.shifts.find(s=>s.employee===employeeName&&s.location===outlet&&s.date===date)||null}
+function weeklyPresetFor(s){if(!s)return'Off';if(s.shiftType&&['Full day','Half AM','Half PM'].includes(s.shiftType))return s.shiftType;return'Custom'}
+function weeklyCellHtml(emp,dayIndex,outlet){const s=weeklyCellShift(emp.name,dayIndex,outlet),preset=weeklyPresetFor(s),date=dateKey(addDays(currentWeek,dayIndex)),h=storeHoursFor(outlet,date)||['09:00','17:00'];let start=s?.start||h[0],end=s?.end||h[1],br=s?.breakMinutes??(preset==='Full day'?30:0);return `<td class="weekly-cell ${preset==='Off'?'weekly-off':''}" data-employee="${esc(emp.name)}" data-day="${dayIndex}"><select class="weekly-preset"><option${preset==='Off'?' selected':''}>Off</option><option${preset==='Full day'?' selected':''}>Full day</option><option${preset==='Half AM'?' selected':''}>Half AM</option><option${preset==='Half PM'?' selected':''}>Half PM</option><option${preset==='Custom'?' selected':''}>Custom</option></select><div class="weekly-time-row"><input class="weekly-start" type="time" value="${start}"><input class="weekly-end" type="time" value="${end}"></div><input class="weekly-break" type="number" min="0" step="5" value="${br}" title="Unpaid break minutes"><span class="weekly-hours">${preset==='Off'?'Off':formatTime(start)+'–'+formatTime(end)}</span></td>`}
+function renderWeeklyRosterGrid(){const outlet=$('weeklyRosterOutlet').value||state.locations[0];$('weeklyRosterWeekLabel').textContent=weekText(currentWeek);$('weeklyRosterBody').innerHTML=state.employees.map(emp=>`<tr><td class="weekly-name">${esc(emp.name)}</td>${Array.from({length:7},(_,i)=>weeklyCellHtml(emp,i,outlet)).join('')}</tr>`).join('');document.querySelectorAll('.weekly-preset').forEach(el=>el.onchange=()=>applyWeeklyPreset(el.closest('.weekly-cell')));document.querySelectorAll('.weekly-start,.weekly-end').forEach(el=>el.onchange=()=>updateWeeklyCellLabel(el.closest('.weekly-cell')))}
+function applyWeeklyPreset(cell){const preset=cell.querySelector('.weekly-preset').value,outlet=$('weeklyRosterOutlet').value,date=dateKey(addDays(currentWeek,Number(cell.dataset.day))),h=storeHoursFor(outlet,date)||['09:00','17:00'],start=cell.querySelector('.weekly-start'),end=cell.querySelector('.weekly-end'),br=cell.querySelector('.weekly-break');cell.classList.toggle('weekly-off',preset==='Off');if(preset==='Full day'){start.value=h[0];end.value=h[1];br.value=30}else if(preset==='Half AM'){start.value=h[0];const [oh,om]=h[0].split(':').map(Number);start.value=h[0];end.value=`${String(Math.min(23,oh+4)).padStart(2,'0')}:${String(om).padStart(2,'0')}`;br.value=0}else if(preset==='Half PM'){const [eh,em]=h[1].split(':').map(Number);start.value=`${String(Math.max(0,eh-4)).padStart(2,'0')}:${String(em).padStart(2,'0')}`;end.value=h[1];br.value=0}updateWeeklyCellLabel(cell)}
+function updateWeeklyCellLabel(cell){const p=cell.querySelector('.weekly-preset').value,s=cell.querySelector('.weekly-start').value,e=cell.querySelector('.weekly-end').value;cell.querySelector('.weekly-hours').textContent=p==='Off'?'Off':`${formatTime(s)}–${formatTime(e)}`}
+function openWeeklyRoster(){renderWeeklyRosterGrid();$('weeklyRosterDialog').showModal()}
+function renderSelects(){const empOpts=state.employees.map(e=>`<option>${esc(e.name)}</option>`).join('');const locOpts=state.locations.map(x=>`<option>${esc(x)}</option>`).join('');$('shiftEmployee').innerHTML=empOpts;$('shiftOutlet').innerHTML=locOpts;$('weeklyRosterOutlet').innerHTML=locOpts;$('employeeOutlet').innerHTML=locOpts;$('rosterOutletFilter').innerHTML=`<option>All outlets</option>${locOpts}`;$('payrollOutletFilter').innerHTML=`<option>All outlets</option>${locOpts}`;$('rosterEmployeeFilter').innerHTML=`<option>All employees</option>${empOpts}`}
+function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function render(){renderSelects();$('weekLabel').textContent=weekText(currentWeek);$('payWeekLabel').textContent=weekText(payWeek);renderRoster();renderEmployees();renderPayroll();renderDashboard();renderStores()}
+function renderRoster(){const outlet=$('rosterOutletFilter').value||'All outlets',emp=$('rosterEmployeeFilter').value||'All employees';const rows=state.shifts.filter(s=>inWeek(s.date,currentWeek)&&(outlet==='All outlets'||s.location===outlet)&&(emp==='All employees'||s.employee===emp)).sort((a,b)=>a.date.localeCompare(b.date)||a.start.localeCompare(b.start));$('rosterBody').innerHTML=rows.length?rows.map(s=>`<tr><td>${new Date(s.date+'T00:00:00').toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'})}</td><td>${esc(s.employee)}</td><td>${esc(s.location)}</td><td>${s.start}–${s.end}${outsideStoreHours(s)?'<br><span class="warning-text">Outside store hours</span>':''}</td><td>${s.breakMinutes||0} min</td><td>${hours(s).toFixed(2)}</td><td>${s.publicHoliday?'Public holiday':esc(s.shiftType||'Custom')}</td><td><div class="actions"><button class="action-btn" onclick="editShift('${s.id}')">Edit</button><button class="action-btn delete" onclick="deleteShift('${s.id}')">Delete</button></div></td></tr>`).join(''):`<tr><td colspan="8" class="empty">No shifts for this week.</td></tr>`}
+function renderEmployees(){$('employeesBody').innerHTML=state.employees.map(e=>`<tr><td><strong>${esc(e.name)}</strong></td><td>${esc(e.homeOutlet)}</td><td>${esc(e.employmentType)}</td><td>${money(e.baseRate)}</td><td>${e.satMultiplier}×</td><td>${e.sunMultiplier}×</td><td>${e.publicHolidayMultiplier}×</td><td>${e.superRate}%</td><td><div class="actions"><button class="action-btn" onclick="editEmployee('${encodeURIComponent(e.name)}')">Edit</button><button class="action-btn delete" onclick="deleteEmployee('${encodeURIComponent(e.name)}')">Delete</button></div></td></tr>`).join('')}
+function renderPayroll(){const rows=payrollRows(payWeek,$('payrollOutletFilter').value||'All outlets');$('payrollBody').innerHTML=rows.length?rows.map(r=>`<tr><td><strong>${esc(r.emp.name)}</strong><br><small>${money(r.emp.baseRate)}/hr</small></td><td>${r.weekday.toFixed(2)}</td><td>${r.sat.toFixed(2)}</td><td>${r.sun.toFixed(2)}</td><td>${r.ph.toFixed(2)}</td><td>${money(r.gross)}</td><td>${money(r.superAmt)}</td><td>${money(r.allowance)}</td><td><strong>${money(r.total)}</strong></td></tr>`).join(''):`<tr><td colspan="9" class="empty">No payroll data for this week.</td></tr>`;const sum=k=>rows.reduce((a,r)=>a+r[k],0);$('grossTotal').textContent=money(sum('gross'));$('superTotal').textContent=money(sum('superAmt'));$('allowanceTotal').textContent=money(sum('allowance'));$('labourTotal').textContent=money(sum('total'))}
+function renderDashboard(){const rows=payrollRows(currentWeek);$('statEmployees').textContent=state.employees.length;$('statOutlets').textContent=state.locations.length;$('statHours').textContent=rows.reduce((a,r)=>a+r.weekday+r.sat+r.sun+r.ph,0).toFixed(1);$('statPayroll').textContent=money(rows.reduce((a,r)=>a+r.total,0));$('outletSummary').innerHTML=state.locations.map(loc=>{const rr=payrollRows(currentWeek,loc),h=rr.reduce((a,r)=>a+r.weekday+r.sat+r.sun+r.ph,0),c=rr.reduce((a,r)=>a+r.total,0);const d=storeDetail(loc),today=dateKey(new Date()),oh=storeHoursFor(loc,today);return`<div class="summary-item"><span>${esc(loc)}</span><strong>${h.toFixed(1)} hrs · ${money(c)}</strong>${oh?`<small>Today: ${formatTime(oh[0])}–${formatTime(oh[1])}</small>`:''}</div>`}).join('')}
+function renderStores(){
+  $('storesVerified').textContent=`Online details verified ${STORE_DETAILS_VERIFIED}`;
+  $('storesGrid').innerHTML=state.locations.map(name=>{const d=storeDetail(name);if(!d)return`<article class="store-card"><h3>${esc(name)}</h3><p class="muted">No online details saved.</p></article>`;return`<article class="store-card"><div class="store-card-head"><div><div class="eyebrow">OUTLET</div><h3>${esc(d.displayName)}</h3></div><a class="source-link" href="${d.source}" target="_blank" rel="noopener">Official page ↗</a></div><p><strong>Address:</strong> ${esc(d.address)}</p><p><strong>Phone:</strong> <a href="tel:${d.phone.replace(/\s/g,'')}">${esc(d.phone)}</a></p><p><strong>Email:</strong> <a href="mailto:${esc(d.email)}">${esc(d.email)}</a></p><div class="hours-list">${DAY_NAMES.map((day,i)=>`<div><span>${day}</span><strong>${formatTime(d.hours[i][0])} – ${formatTime(d.hours[i][1])}</strong></div>`).join('')}</div></article>`}).join('')
 }
+function openShift(s=null){$('shiftForm').reset();$('shiftId').value=s?.id||'';$('shiftDialogTitle').textContent=s?'Edit shift':'Add shift';$('shiftEmployee').value=s?.employee||state.employees[0]?.name;$('shiftOutlet').value=s?.location||state.locations[0];$('shiftDate').value=s?.date||dateKey(currentWeek);$('shiftType').value=s?.shiftType||'Custom';$('shiftStart').value=s?.start||'09:00';$('shiftEnd').value=s?.end||'17:00';$('shiftBreak').value=s?.breakMinutes??30;$('shiftPublicHoliday').checked=!!s?.publicHoliday;$('shiftNotes').value=s?.notes||'';updateStoreHoursHint();$('shiftDialog').showModal()}
+window.editShift=id=>openShift(state.shifts.find(s=>s.id===id));window.deleteShift=async id=>{if(confirm('Delete this shift?')){state.shifts=state.shifts.filter(s=>s.id!==id);await save()}}
+function openEmployee(e=null){$('employeeForm').reset();$('employeeDialogTitle').textContent=e?'Edit employee':'Add employee';$('employeeOriginalName').value=e?.name||'';$('employeeName').value=e?.name||'';$('employeeOutlet').value=e?.homeOutlet||state.locations[0];$('employeeType').value=e?.employmentType||'Casual';$('employeeRate').value=e?.baseRate??30;$('employeeSat').value=e?.satMultiplier??1.25;$('employeeSun').value=e?.sunMultiplier??1.5;$('employeePH').value=e?.publicHolidayMultiplier??2.5;$('employeeSuper').value=e?.superRate??12;$('employeeAllowance').value=e?.weeklyAllowance??0;$('employeeDialog').showModal()}
+window.editEmployee=n=>openEmployee(employee(decodeURIComponent(n)));window.deleteEmployee=async n=>{const name=decodeURIComponent(n);if(confirm(`Delete ${name}? Existing shifts will remain.`)){state.employees=state.employees.filter(e=>e.name!==name);await save()}}
+function csvDownload(filename,rows){const csv=rows.map(r=>r.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=filename;a.click();URL.revokeObjectURL(a.href)}
 
-function weekEnd(start) {
-  const d = new Date(start);
-  d.setDate(d.getDate() + 6);
-  return d;
-}
-
-function weekLabel(start) {
-  const end = weekEnd(start);
-  return `${start.toLocaleDateString([], { day: 'numeric', month: 'short' })} – ${end.toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' })}`;
-}
-
-function toast(msg) {
-  const t = $('toast');
-  t.textContent = msg;
-  t.classList.remove('hidden');
-  window.clearTimeout(toast._timer);
-  toast._timer = window.setTimeout(() => t.classList.add('hidden'), 2200);
-}
-
-function setConnection(ok, text) {
-  const el = $('connectionStatus');
-  if (!el) return;
-  el.textContent = text || (ok ? 'Cloud connected' : 'Offline');
-  el.className = `sync-status ${ok ? 'online' : 'offline'}`;
-}
-
-function editorName() {
-  return currentUser?.email || 'Admin';
-}
-
-function shiftsForWeek(start, employee = 'all') {
-  const s = isoDate(start);
-  const e = isoDate(weekEnd(start));
-  return state.shifts
-    .filter(x => x.date >= s && x.date <= e && (employee === 'all' || x.employee === employee))
-    .sort((a, b) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start) || a.employee.localeCompare(b.employee));
-}
-
-function shiftHours(x) {
-  const [sh, sm] = x.start.split(':').map(Number);
-  const [eh, em] = x.end.split(':').map(Number);
-  return Math.max(0, ((eh * 60 + em) - (sh * 60 + sm) - (Number(x.breakMin) || 0)) / 60);
-}
-
-function fillSelect(select, values, includeAll = false) {
-  select.innerHTML = (includeAll ? '<option value="all">All employees</option>' : '') + values.map(v => `<option value="${v}">${v}</option>`).join('');
-}
-
-async function loadState() {
-  const { data, error } = await db.from('roster_state').select('state, revision, updated_at, updated_by').eq('id', 1).single();
-  if (error) throw error;
-  state = { ...defaultState, ...(data.state || {}), revision: Number(data.revision || 0), updatedAt: data.updated_at, updatedBy: data.updated_by };
-}
-
-async function save() {
-  if (saving) {
-    queuedSave = true;
-    return;
-  }
-  saving = true;
-  setConnection(true, 'Saving…');
-  const payload = { employees: state.employees, locations: state.locations, shifts: state.shifts, payroll: state.payroll };
-  try {
-    const { data, error } = await db.rpc('save_roster_state', {
-      p_state: payload,
-      p_base_revision: Number(state.revision || 0),
-      p_updated_by: editorName()
-    });
-    if (error) throw error;
-    const row = Array.isArray(data) ? data[0] : data;
-    if (!row) throw new Error('No save response');
-    if (row.conflict) {
-      state = { ...defaultState, ...(row.state || {}), revision: Number(row.revision || 0), updatedAt: row.updated_at, updatedBy: row.updated_by };
-      render();
-      toast('Another user changed the roster. Latest version loaded.');
-    } else {
-      state.revision = Number(row.revision || state.revision + 1);
-      state.updatedAt = row.updated_at;
-      state.updatedBy = row.updated_by;
-      setConnection(true, 'Cloud synced');
-    }
-  } catch (err) {
-    console.error(err);
-    setConnection(false, 'Save failed');
-    toast(err.message || 'Could not save roster');
-  } finally {
-    saving = false;
-    if (queuedSave) {
-      queuedSave = false;
-      save();
-    }
-  }
-}
-
-function connectLiveUpdates() {
-  if (realtimeChannel) db.removeChannel(realtimeChannel);
-  realtimeChannel = db.channel('supps247-roster-live')
-    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'roster_state', filter: 'id=eq.1' }, payload => {
-      const row = payload.new;
-      if (Number(row.revision) > Number(state.revision)) {
-        state = { ...defaultState, ...(row.state || {}), revision: Number(row.revision), updatedAt: row.updated_at, updatedBy: row.updated_by };
-        render();
-        toast(`Roster updated by ${row.updated_by || 'another user'}`);
-      }
-    })
-    .subscribe(status => {
-      if (status === 'SUBSCRIBED') setConnection(true, 'Cloud synced');
-      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') setConnection(false, 'Reconnecting…');
-    });
-}
-
-function renderRosterBuilder() {
-  $('managerWeekLabel').textContent = weekLabel(selectedWeek);
-  const filter = $('employeeFilter').value || 'all';
-  const shifts = shiftsForWeek(selectedWeek, filter);
-  $('rosterTableBody').innerHTML = shifts.length ? shifts.map(s => {
-    const d = parseDate(s.date);
-    return `<tr><td><strong>${dayName(d)}</strong><small>${d.toLocaleDateString([], { day: 'numeric', month: 'short' })}</small></td><td>${s.employee}</td><td>${s.location}</td><td>${fmtTime(s.start)}</td><td>${fmtTime(s.end)}</td><td>${s.breakMin || 0} min</td><td>${shiftHours(s).toFixed(1)}</td><td class="actions"><button class="icon-btn edit-shift" data-id="${s.id}">Edit</button><button class="icon-btn delete-shift" data-id="${s.id}">Delete</button></td></tr>`;
-  }).join('') : `<tr><td colspan="8" class="empty">No shifts for this week. Click “Add shift” or “Outlet weekly roster” to start.</td></tr>`;
-
-  document.querySelectorAll('.edit-shift').forEach(b => b.onclick = () => openShiftDialog(state.shifts.find(s => s.id === b.dataset.id)));
-  document.querySelectorAll('.delete-shift').forEach(b => b.onclick = () => {
-    if (confirm('Delete this shift?')) {
-      state.shifts = state.shifts.filter(s => s.id !== b.dataset.id);
-      save();
-      render();
-      toast('Shift deleted');
-    }
-  });
-}
-
-function shiftsForOutletWeek(start) {
-  const s = isoDate(start);
-  const e = isoDate(weekEnd(start));
-  const weekly = state.shifts.filter(x => x.date >= s && x.date <= e);
-  const locations = [...new Set(weekly.map(s => s.location))].sort((a, b) => a.localeCompare(b));
-  return locations.map(location => {
-    const days = Array.from({ length: 7 }, (_, dayIndex) => {
-      const d = new Date(start);
-      d.setDate(d.getDate() + dayIndex);
-      const date = isoDate(d);
-      return weekly
-        .filter(shift => shift.location === location && shift.date === date)
-        .sort((a, b) => a.start.localeCompare(b.start) || a.employee.localeCompare(b.employee));
-    });
-    return { location, days };
-  });
-}
-
-function renderOutletWeekView() {
-  const body = $('outletRosterBody');
-  if (!body) return;
-  const outlets = shiftsForOutletWeek(selectedWeek);
-  if (!outlets.length) {
-    body.innerHTML = `<tr><td colspan="9" class="empty">No outlet rosters for this week yet.</td></tr>`;
-    return;
-  }
-  body.innerHTML = outlets.map(({ location, days }) => {
-    const totalHours = days.flat().reduce((sum, s) => sum + shiftHours(s), 0);
-    const cells = days.map(dayShifts => {
-      if (!dayShifts.length) return `<td class="outlet-day empty-day">—</td>`;
-      return `<td class="outlet-day">${dayShifts.map(s => `
-        <div class="outlet-shift">
-          <strong>${s.employee}</strong>
-          <span>${fmtTime(s.start)}–${fmtTime(s.end)}</span>
-        </div>
-      `).join('')}</td>`;
-    }).join('');
-    return `<tr>
-      <td class="outlet-name"><strong>${location}</strong></td>
-      ${cells}
-      <td class="outlet-total">${totalHours.toFixed(1)}</td>
-    </tr>`;
-  }).join('');
-}
-
-function renderTodayTeam() {
-  const today = isoDate(new Date());
-  const shifts = state.shifts.filter(s => s.date === today).sort((a, b) => a.location.localeCompare(b.location) || a.start.localeCompare(b.start));
-  $('teamList').innerHTML = shifts.length
-    ? shifts.map(s => `<div class="team-row"><div><strong>${s.employee}</strong><p>${s.location} · ${fmtTime(s.start)}–${fmtTime(s.end)}</p></div><span class="status on">Scheduled</span></div>`).join('')
-    : '<p class="muted">No staff rostered today.</p>';
-}
-
-function renderStats() {
-  const today = isoDate(new Date());
-  const todayShifts = state.shifts.filter(s => s.date === today);
-  const weekShifts = shiftsForWeek(selectedWeek);
-  $('rosteredToday').textContent = todayShifts.length;
-  $('activeOutlets').textContent = new Set(todayShifts.map(s => s.location)).size;
-  $('weeklyShifts').textContent = weekShifts.length;
-  $('managerHours').textContent = weekShifts.reduce((sum, s) => sum + shiftHours(s), 0).toFixed(1);
-  $('heroToday').textContent = todayShifts.length;
-  $('heroWeek').textContent = weekShifts.length;
-  $('heroOutlets').textContent = state.locations.length;
-}
-
-function render() {
-  renderRosterBuilder();
-  renderOutletWeekView();
-  renderTodayTeam();
-  renderStats();
-}
-
-function openShiftDialog(shift = null) {
-  $('dialogTitle').textContent = shift ? 'Edit shift' : 'Add shift';
-  $('shiftId').value = shift?.id || '';
-  $('shiftEmployee').value = shift?.employee || state.employees[0];
-  $('shiftDate').value = shift?.date || isoDate(selectedWeek);
-  $('shiftLocation').value = shift?.location || state.locations[0];
-  $('shiftStart').value = shift?.start || '09:00';
-  $('shiftEnd').value = shift?.end || '17:00';
-  $('shiftBreak').value = shift?.breakMin ?? 30;
-  $('shiftNotes').value = shift?.notes || '';
-  $('shiftDialog').showModal();
-}
-
-function renderBulkRosterRows() {
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  $('bulkRosterBody').innerHTML = state.employees.map(employee => `
-    <tr data-employee="${employee}">
-      <td><strong>${employee}</strong></td>
-      ${days.map((d, i) => `<td class="day-shift" data-day="${i}">
-        <label class="day-toggle"><input type="checkbox" class="day-enabled" aria-label="${employee} ${d}"><span>Work</span></label>
-        <select class="shift-preset" disabled aria-label="${employee} ${d} shift type">
-          <option value="full">Full day</option>
-          <option value="half-am">Half AM</option>
-          <option value="half-pm">Half PM</option>
-          <option value="custom">Custom</option>
-        </select>
-        <div class="day-times">
-          <input class="day-start" type="time" value="09:00" disabled aria-label="${employee} ${d} start">
-          <input class="day-end" type="time" value="17:00" disabled aria-label="${employee} ${d} finish">
-        </div>
-        <label class="break-label">Break <input class="day-break" type="number" min="0" step="5" value="30" disabled></label>
-      </td>`).join('')}
-    </tr>`).join('');
-
-  $('bulkRosterBody').querySelectorAll('.day-shift').forEach(cell => {
-    const enabled = cell.querySelector('.day-enabled');
-    const preset = cell.querySelector('.shift-preset');
-    const start = cell.querySelector('.day-start');
-    const end = cell.querySelector('.day-end');
-    const breakInput = cell.querySelector('.day-break');
-    const applyPreset = () => {
-      if (preset.value === 'full') { start.value = '09:00'; end.value = '17:00'; breakInput.value = '30'; }
-      if (preset.value === 'half-am') { start.value = '09:00'; end.value = '13:00'; breakInput.value = '0'; }
-      if (preset.value === 'half-pm') { start.value = '13:00'; end.value = '17:00'; breakInput.value = '0'; }
-    };
-    enabled.addEventListener('change', () => {
-      [preset, start, end, breakInput].forEach(el => el.disabled = !enabled.checked);
-      if (enabled.checked) applyPreset();
-    });
-    preset.addEventListener('change', applyPreset);
-  });
-}
-
-function openBulkRosterDialog() {
-  $('bulkWeek').value = isoDate(selectedWeek);
-  $('bulkLocation').value = state.locations[0];
-  renderBulkRosterRows();
-  $('bulkRosterDialog').showModal();
-}
-
-function showApp(session) {
-  currentUser = session.user;
-  $('loginView').classList.add('hidden');
-  $('managerView').classList.remove('hidden');
-  $('logoutBtn').classList.remove('hidden');
-  loadState()
-    .then(() => {
-      fillSelect($('employeeFilter'), state.employees, true);
-      fillSelect($('shiftEmployee'), state.employees);
-      fillSelect($('shiftLocation'), state.locations);
-      fillSelect($('bulkLocation'), state.locations);
-      connectLiveUpdates();
-      setConnection(true, 'Cloud synced');
-      render();
-    })
-    .catch(err => {
-      console.error(err);
-      setConnection(false, 'Database setup required');
-      toast('Run setup.sql in Supabase SQL Editor first');
-    });
-}
-
-function showLogin() {
-  currentUser = null;
-  $('managerView').classList.add('hidden');
-  $('loginView').classList.remove('hidden');
-  $('logoutBtn').classList.add('hidden');
-  setConnection(false, 'Sign in required');
-}
-
-$('bulkRoster').onclick = openBulkRosterDialog;
-$('closeBulkDialog').onclick = () => $('bulkRosterDialog').close();
-$('cancelBulkDialog').onclick = () => $('bulkRosterDialog').close();
-$('bulkRosterForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const week = mondayOf(parseDate($('bulkWeek').value));
-  const location = $('bulkLocation').value;
-  let added = 0, skipped = 0;
-  $('bulkRosterBody').querySelectorAll('tr').forEach(row => {
-    const employee = row.dataset.employee;
-    row.querySelectorAll('.day-shift').forEach(cell => {
-      if (!cell.querySelector('.day-enabled').checked) return;
-      const start = cell.querySelector('.day-start').value;
-      const end = cell.querySelector('.day-end').value;
-      const breakMin = Number(cell.querySelector('.day-break').value) || 0;
-      if (!start || !end || end <= start) { skipped++; return; }
-      const d = new Date(week);
-      d.setDate(d.getDate() + Number(cell.dataset.day));
-      const date = isoDate(d);
-      const duplicate = state.shifts.some(s => s.date === date && s.employee === employee && s.location === location && s.start === start);
-      if (duplicate) { skipped++; return; }
-      const preset = cell.querySelector('.shift-preset').value;
-      const notes = preset === 'full' ? 'Full day' : preset === 'half-am' ? 'Half day (AM)' : preset === 'half-pm' ? 'Half day (PM)' : 'Custom shift';
-      state.shifts.push({ id: crypto.randomUUID(), date, employee, location, start, end, breakMin, notes });
-      added++;
-    });
-  });
-  if (!added && !skipped) {
-    toast('Select at least one employee day');
-    return;
-  }
-  save();
-  $('bulkRosterDialog').close();
-  selectedWeek = week;
-  render();
-  toast(`${added} shifts added${skipped ? `, ${skipped} skipped` : ''}`);
-});
-
-$('shiftForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const id = $('shiftId').value;
-  const item = {
-    id: id || crypto.randomUUID(),
-    employee: $('shiftEmployee').value,
-    date: $('shiftDate').value,
-    location: $('shiftLocation').value,
-    start: $('shiftStart').value,
-    end: $('shiftEnd').value,
-    breakMin: Number($('shiftBreak').value) || 0,
-    notes: $('shiftNotes').value.trim()
-  };
-  if (item.end <= item.start) {
-    toast('Finish time must be after start time');
-    return;
-  }
-  if (id) {
-    const i = state.shifts.findIndex(s => s.id === id);
-    state.shifts[i] = item;
-  } else {
-    state.shifts.push(item);
-  }
-  save();
-  $('shiftDialog').close();
-  render();
-  toast(id ? 'Shift updated' : 'Shift added');
-});
-
-$('closeDialog').onclick = () => $('shiftDialog').close();
-$('cancelDialog').onclick = () => $('shiftDialog').close();
-$('addShift').onclick = () => openShiftDialog();
-$('prevWeek').onclick = () => {
-  selectedWeek.setDate(selectedWeek.getDate() - 7);
-  render();
-};
-$('nextWeek').onclick = () => {
-  selectedWeek.setDate(selectedWeek.getDate() + 7);
-  render();
-};
-$('employeeFilter').onchange = render;
-$('copyWeek').onclick = () => {
-  const previous = new Date(selectedWeek);
-  previous.setDate(previous.getDate() - 7);
-  const source = shiftsForWeek(previous);
-  if (!source.length) {
-    toast('Previous week has no shifts');
-    return;
-  }
-  const existingIds = new Set(shiftsForWeek(selectedWeek).map(s => `${s.date}|${s.employee}|${s.location}|${s.start}`));
-  let added = 0;
-  source.forEach(s => {
-    const d = parseDate(s.date);
-    d.setDate(d.getDate() + 7);
-    const copy = { ...s, id: crypto.randomUUID(), date: isoDate(d) };
-    const key = `${copy.date}|${copy.employee}|${copy.location}|${copy.start}`;
-    if (!existingIds.has(key)) {
-      state.shifts.push(copy);
-      added++;
-    }
-  });
-  save();
-  render();
-  toast(`${added} shifts copied`);
-};
-$('bulkRoster').onclick = openBulkRosterDialog;
-$('clearWeek').onclick = () => {
-  if (!confirm(`Clear all shifts for ${weekLabel(selectedWeek)}?`)) return;
-  const s = isoDate(selectedWeek), e = isoDate(weekEnd(selectedWeek));
-  state.shifts = state.shifts.filter(x => x.date < s || x.date > e);
-  save();
-  render();
-  toast('Week cleared');
-};
-$('exportRoster').onclick = () => {
-  const shifts = shiftsForWeek(selectedWeek);
-  if (!shifts.length) {
-    toast('No shifts to export');
-    return;
-  }
-  const rows = [['Date', 'Day', 'Employee', 'Outlet', 'Start', 'Finish', 'Break Minutes', 'Paid Hours', 'Notes'], ...shifts.map(s => [s.date, dayName(parseDate(s.date)), s.employee, s.location, s.start, s.end, s.breakMin || 0, shiftHours(s).toFixed(2), s.notes || ''])];
-  const csv = rows.map(r => r.map(v => `"${String(v).replaceAll('"', '""')}"`).join(',')).join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-  a.download = `supps247-roster-${isoDate(selectedWeek)}.csv`;
-  a.click();
-  URL.revokeObjectURL(a.href);
-};
-$('downloadBackup').onclick = () => {
-  const backup = { exportedAt: new Date().toISOString(), project: 'Supps247 Roster', ...state };
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' }));
-  a.download = `supps247-roster-backup-${new Date().toISOString().slice(0, 10)}.json`;
-  a.click();
-  URL.revokeObjectURL(a.href);
-};
-
-$('loginForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  $('loginError').classList.add('hidden');
-  const { data, error } = await db.auth.signInWithPassword({ email: $('loginEmail').value.trim(), password: $('loginPassword').value });
-  if (error) {
-    $('loginError').textContent = error.message;
-    $('loginError').classList.remove('hidden');
-    return;
-  }
-  await showApp(data.session);
-});
-
-$('logoutBtn').onclick = async () => {
-  await db.auth.signOut();
-  showLogin();
-};
-
-async function initialise() {
-  const { data: { session } } = await db.auth.getSession();
-  if (session) showApp(session); else showLogin();
-  db.auth.onAuthStateChange((event) => {
-    if (event === 'SIGNED_OUT') showLogin();
-  });
-}
-
-window.rosterApp = {
-  get state() { return state; },
-  set state(value) { state = value; },
-  get selectedWeek() { return selectedWeek; },
-  set selectedWeek(value) { selectedWeek = value; },
-  save,
-  render,
-  toast,
-  mondayOf,
-  weekEnd,
-  weekLabel,
-  isoDate,
-  parseDate,
-  shiftsForWeek,
-  shiftsForOutletWeek,
-  shiftHours,
-  fillSelect,
-  setConnection,
-  editorName
-};
-
-initialise();
+function parseDateLoose(value){if(!value)return'';const d=new Date(value);if(!isNaN(d))return dateKey(d);const m=String(value).match(/([A-Za-z]{3})\s+(\d{1,2}),\s*(\d{4})/);if(m){const d2=new Date(`${m[1]} ${m[2]}, ${m[3]}`);if(!isNaN(d2))return dateKey(d2)}return''}
+function accountSuppliers(){return [...new Set((state.accounts||[]).map(x=>x.supplier).filter(Boolean))].sort((a,b)=>a.localeCompare(b))}
+function accountOutlets(){return [...new Set((state.accounts||[]).map(x=>x.outlet).filter(Boolean))].sort((a,b)=>a.localeCompare(b))}
+function isOutstanding(a){return !['Paid','Prepaid','Credit received','Internal transfer','No payment required'].includes(a.paymentStatus)}
+function filteredAccounts(){const outlet=$('accountsOutletFilter')?.value||'All outlets',supplier=$('accountsSupplierFilter')?.value||'All suppliers',status=$('accountsStatusFilter')?.value||'All statuses',q=($('accountsSearch')?.value||'').trim().toLowerCase();return (state.accounts||[]).filter(a=>(outlet==='All outlets'||a.outlet===outlet)&&(supplier==='All suppliers'||a.supplier===supplier)&&(status==='All statuses'||a.paymentStatus===status)&&(!q||`${a.invoiceNumber} ${a.supplier} ${a.outlet}`.toLowerCase().includes(q))).sort((a,b)=>(b.receivedDate||'').localeCompare(a.receivedDate||''))}
+function renderAccounts(){if(!$('accountsBody'))return;const oldO=$('accountsOutletFilter').value,oldS=$('accountsSupplierFilter').value;$('accountsOutletFilter').innerHTML=['All outlets',...accountOutlets()].map(x=>`<option>${esc(x)}</option>`).join('');$('accountsSupplierFilter').innerHTML=['All suppliers',...accountSuppliers()].map(x=>`<option>${esc(x)}</option>`).join('');if([...$('accountsOutletFilter').options].some(o=>o.value===oldO))$('accountsOutletFilter').value=oldO;if([...$('accountsSupplierFilter').options].some(o=>o.value===oldS))$('accountsSupplierFilter').value=oldS;$('supplierList').innerHTML=accountSuppliers().map(x=>`<option value="${esc(x)}">`).join('');$('outletList').innerHTML=accountOutlets().map(x=>`<option value="${esc(x)}">`).join('');const rows=filteredAccounts();$('accountsBody').innerHTML=rows.length?rows.map(a=>`<tr class="${a.paymentStatus==='Paid'?'paid-row':''}"><td><strong>${esc(a.invoiceNumber||'')}</strong></td><td>${esc(a.supplier||'')}</td><td>${esc(a.outlet||'')}</td><td>${esc(a.receivedDate||'—')}</td><td>${esc(a.dueDate||'—')}</td><td>${Number(a.quantity||0)}</td><td>${money(a.amount)}</td><td><span class="status-pill status-${String(a.paymentStatus||'').toLowerCase().replaceAll(' ','-')}">${esc(a.paymentStatus||'Unconfirmed')}</span></td><td>${esc(a.paidDate||'—')}</td><td><div class="row-actions"><button class="link-btn" onclick="editInvoice('${a.id}')">Edit</button><button class="link-btn danger-text" onclick="deleteInvoice('${a.id}')">Delete</button></div></td></tr>`).join(''):'<tr><td colspan="10" class="empty">No invoices match these filters.</td></tr>';const all=state.accounts||[],today=dateKey(new Date()),soon=dateKey(addDays(new Date(),7));$('accOutstanding').textContent=money(all.filter(isOutstanding).reduce((s,a)=>s+Number(a.amount||0),0));$('accOverdue').textContent=all.filter(a=>isOutstanding(a)&&a.dueDate&&parseDateLoose(a.dueDate)<today).length;$('accDueSoon').textContent=all.filter(a=>isOutstanding(a)&&a.dueDate&&parseDateLoose(a.dueDate)>=today&&parseDateLoose(a.dueDate)<=soon).length;$('accPaid').textContent=money(all.filter(a=>a.paymentStatus==='Paid').reduce((s,a)=>s+Number(a.amount||0),0))}
+function openInvoice(a=null){$('invoiceForm').reset();$('invoiceId').value=a?.id||'';$('invoiceDialogTitle').textContent=a?'Edit supplier invoice':'Add supplier invoice';$('invoiceNumber').value=a?.invoiceNumber||'';$('invoiceSupplier').value=a?.supplier||'';$('invoiceOutlet').value=a?.outlet||'';$('invoiceReceivedDate').value=parseDateLoose(a?.receivedDate||'');$('invoiceDueDate').value=parseDateLoose(a?.dueDate||'');$('invoiceQuantity').value=a?.quantity??0;$('invoiceAmount').value=a?.amount??0;$('invoicePaymentStatus').value=a?.paymentStatus||'Unconfirmed';$('invoicePaidDate').value=parseDateLoose(a?.paidDate||'');$('invoicePaymentReference').value=a?.paymentReference||'';$('invoiceNotes').value=a?.notes||'';$('invoiceDialog').showModal()}
+window.editInvoice=id=>openInvoice((state.accounts||[]).find(a=>a.id===id));window.deleteInvoice=async id=>{if(confirm('Delete this invoice record?')){state.accounts=(state.accounts||[]).filter(a=>a.id!==id);await save()}}
+function parseReceivingText(txt){const lines=txt.split(/\r?\n/).map(x=>x.trim()).filter(Boolean),out=[];let i=lines[0]?.startsWith('Order number')?1:0;while(i<lines.length){const invoiceNumber=lines[i++];if(i+1>=lines.length)break;let meta=lines[i++].split('\t').map(x=>x.trim()).filter(Boolean),vals=lines[i++].split('\t').map(x=>x.trim()).filter(Boolean),dueDate='';if(meta[0]?.startsWith('Due:'))dueDate=meta.shift().slice(4).trim();if(meta.length<3||vals.length<3)continue;const [supplier,rawOutlet,receivingStatus]=meta,[receivedDate,qtyRaw,amountRaw]=vals;if(receivingStatus!=='Received')continue;const outlet=rawOutlet==='Supps247 Chirnside Park'?'Chirnside Park':rawOutlet==='South Yarra'?'South Yarra (Chapel Street)':rawOutlet==='Springvale'?'Springvale (Head Office)':rawOutlet;out.push({id:crypto.randomUUID(),invoiceNumber,supplier,outlet,receivedDate,dueDate,quantity:Number(qtyRaw.replace(/[^0-9]/g,''))||0,amount:Number(amountRaw.replace(/,/g,'').replace(/[^0-9.]/g,''))||0,receivingStatus:'Received',paymentStatus:applySupplierPaymentDefaults({supplier,paymentStatus:'Unconfirmed'}).paymentStatus,paidDate:'',paymentReference:'',notes:'Imported from receiving file',source:'Receiving import'})}return out}
+$('loginForm').onsubmit=async e=>{e.preventDefault();$('loginError').classList.add('hidden');const {data,error}=await db.auth.signInWithPassword({email:$('loginEmail').value.trim(),password:$('loginPassword').value});if(error){$('loginError').textContent=error.message;$('loginError').classList.remove('hidden')}else showApp(data.session)}
+async function showApp(session){currentUser=session.user;$('loginView').classList.add('hidden');$('appView').classList.remove('hidden');$('logoutBtn').classList.remove('hidden');try{await load();subscribe();setStatus(true,'Cloud synced');render()}catch(e){console.error(e);setStatus(false,'Setup required');toast('Run setup.sql in Supabase SQL Editor')}}
+$('logoutBtn').onclick=async()=>{await db.auth.signOut();location.reload()};
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));$(`${b.dataset.view}View`).classList.remove('hidden')});
+$('prevWeek').onclick=()=>{currentWeek=addDays(currentWeek,-7);render()};$('nextWeek').onclick=()=>{currentWeek=addDays(currentWeek,7);render()};$('payPrevWeek').onclick=()=>{payWeek=addDays(payWeek,-7);render()};$('payNextWeek').onclick=()=>{payWeek=addDays(payWeek,7);render()};
+$('rosterOutletFilter').onchange=renderRoster;$('weeklyRosterOutlet').onchange=renderWeeklyRosterGrid;$('rosterEmployeeFilter').onchange=renderRoster;$('payrollOutletFilter').onchange=renderPayroll;$('addShiftBtn').onclick=()=>openShift();$('weeklyRosterBtn').onclick=openWeeklyRoster;$('addEmployeeBtn').onclick=()=>openEmployee();$('addInvoiceBtn').onclick=()=>openInvoice();$('accountsOutletFilter').onchange=renderAccounts;$('accountsSupplierFilter').onchange=renderAccounts;$('accountsStatusFilter').onchange=renderAccounts;$('accountsSearch').oninput=renderAccounts;$('exportAccountsBtn').onclick=()=>csvDownload(`supps247-accounts-${dateKey(new Date())}.csv`,[['Invoice','Supplier','Outlet','Received date','Due date','Quantity','Amount','Payment status','Paid date','Payment reference','Notes'],...filteredAccounts().map(a=>[a.invoiceNumber,a.supplier,a.outlet,a.receivedDate,a.dueDate,a.quantity,a.amount,a.paymentStatus,a.paidDate,a.paymentReference,a.notes])]);$('importReceivingBtn').onclick=()=>$('receivingFileInput').click();$('receivingFileInput').onchange=async e=>{const f=e.target.files[0];if(!f)return;const imported=parseReceivingText(await f.text());let added=0;for(const row of imported){const dup=(state.accounts||[]).some(a=>a.invoiceNumber===row.invoiceNumber&&a.supplier===row.supplier&&Number(a.amount)===Number(row.amount));if(!dup){state.accounts.push(row);added++}}await save();toast(`${added} receiving records imported`);e.target.value=''};
+$('shiftOutlet').onchange=updateStoreHoursHint;$('shiftDate').onchange=updateStoreHoursHint;$('useStoreHoursBtn').onclick=applyStoreHours;
+$('shiftType').onchange=()=>{const p=$('shiftType').value;if(p==='Full day'){applyStoreHours()}if(p==='Half AM'){ $('shiftStart').value='09:00';$('shiftEnd').value='13:00';$('shiftBreak').value=0 }if(p==='Half PM'){ $('shiftStart').value='13:00';$('shiftEnd').value='17:00';$('shiftBreak').value=0 }};
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(`${b.dataset.close}`).close());
+$('shiftForm').onsubmit=async e=>{e.preventDefault();const id=$('shiftId').value||crypto.randomUUID();const row={id,employee:$('shiftEmployee').value,location:$('shiftOutlet').value,date:$('shiftDate').value,shiftType:$('shiftType').value,start:$('shiftStart').value,end:$('shiftEnd').value,breakMinutes:Number($('shiftBreak').value||0),publicHoliday:$('shiftPublicHoliday').checked,notes:$('shiftNotes').value.trim()};if(outsideStoreHours(row)&&!confirm('This shift is outside the published store opening hours. Save it anyway?'))return;const i=state.shifts.findIndex(s=>s.id===id);if(i>=0)state.shifts[i]=row;else state.shifts.push(row);$('shiftDialog').close();await save()};
+$('loadStoreHoursWeekBtn').onclick=()=>{document.querySelectorAll('#weeklyRosterBody .weekly-cell').forEach(cell=>{cell.querySelector('.weekly-preset').value='Full day';applyWeeklyPreset(cell)})};
+$('clearWeeklyGridBtn').onclick=()=>{document.querySelectorAll('#weeklyRosterBody .weekly-cell').forEach(cell=>{cell.querySelector('.weekly-preset').value='Off';applyWeeklyPreset(cell)})};
+$('weeklyRosterForm').onsubmit=async e=>{e.preventDefault();const outlet=$('weeklyRosterOutlet').value,employeeNames=new Set(state.employees.map(x=>x.name));state.shifts=state.shifts.filter(s=>!(s.location===outlet&&inWeek(s.date,currentWeek)&&employeeNames.has(s.employee)));document.querySelectorAll('#weeklyRosterBody .weekly-cell').forEach(cell=>{const preset=cell.querySelector('.weekly-preset').value;if(preset==='Off')return;const day=Number(cell.dataset.day),date=dateKey(addDays(currentWeek,day)),row={id:crypto.randomUUID(),employee:cell.dataset.employee,location:outlet,date,shiftType:preset,start:cell.querySelector('.weekly-start').value,end:cell.querySelector('.weekly-end').value,breakMinutes:Number(cell.querySelector('.weekly-break').value||0),publicHoliday:false,notes:'Created in weekly roster'};state.shifts.push(row)});$('weeklyRosterDialog').close();await save();toast('Weekly roster saved')};
+$('invoiceForm').onsubmit=async e=>{e.preventDefault();const id=$('invoiceId').value||crypto.randomUUID();const row=applySupplierPaymentDefaults({id,invoiceNumber:$('invoiceNumber').value.trim(),supplier:$('invoiceSupplier').value.trim(),outlet:$('invoiceOutlet').value.trim(),receivedDate:$('invoiceReceivedDate').value,dueDate:$('invoiceDueDate').value,quantity:Number($('invoiceQuantity').value||0),amount:Number($('invoiceAmount').value||0),receivingStatus:'Received',paymentStatus:$('invoicePaymentStatus').value,paidDate:$('invoicePaidDate').value,paymentReference:$('invoicePaymentReference').value.trim(),notes:$('invoiceNotes').value.trim(),source:'Manual / corrected'});const i=(state.accounts||[]).findIndex(a=>a.id===id);if(i>=0)state.accounts[i]=row;else state.accounts.push(row);$('invoiceDialog').close();await save();toast('Invoice saved')};
+$('employeeForm').onsubmit=async e=>{e.preventDefault();const original=$('employeeOriginalName').value,name=$('employeeName').value.trim();if(!name)return;const row={name,homeOutlet:$('employeeOutlet').value,employmentType:$('employeeType').value,baseRate:Number($('employeeRate').value||0),satMultiplier:Number($('employeeSat').value||1),sunMultiplier:Number($('employeeSun').value||1),publicHolidayMultiplier:Number($('employeePH').value||1),superRate:Number($('employeeSuper').value||0),weeklyAllowance:Number($('employeeAllowance').value||0)};const i=state.employees.findIndex(x=>x.name===original);if(i>=0){state.employees[i]=row;if(original!==name)state.shifts.forEach(s=>{if(s.employee===original)s.employee=name})}else state.employees.push(row);$('employeeDialog').close();await save()};
+$('copyWeekBtn').onclick=async()=>{const sourceStart=addDays(currentWeek,-7),source=state.shifts.filter(s=>inWeek(s.date,sourceStart));if(!source.length)return toast('Previous week has no shifts');source.forEach(s=>state.shifts.push({...s,id:crypto.randomUUID(),date:dateKey(addDays(new Date(s.date+'T00:00:00'),7))}));await save();toast('Previous week copied')};
+$('exportRosterBtn').onclick=()=>{const rows=[['Date','Employee','Outlet','Start','Finish','Break minutes','Paid hours','Public holiday'],...state.shifts.filter(s=>inWeek(s.date,currentWeek)).map(s=>[s.date,s.employee,s.location,s.start,s.end,s.breakMinutes,hours(s).toFixed(2),s.publicHoliday?'Yes':'No'])];csvDownload(`supps247-roster-${dateKey(currentWeek)}.csv`,rows)};
+$('exportPayrollBtn').onclick=()=>{const rows=payrollRows(payWeek,$('payrollOutletFilter').value||'All outlets');csvDownload(`supps247-payroll-${dateKey(payWeek)}.csv`,[['Employee','Weekday hours','Saturday hours','Sunday hours','Public holiday hours','Base rate','Gross','Super','Allowance','Total labour cost'],...rows.map(r=>[r.emp.name,r.weekday.toFixed(2),r.sat.toFixed(2),r.sun.toFixed(2),r.ph.toFixed(2),r.emp.baseRate,r.gross.toFixed(2),r.superAmt.toFixed(2),r.allowance.toFixed(2),r.total.toFixed(2)])])};
+(async()=>{const {data:{session}}=await db.auth.getSession();if(session)showApp(session);else setStatus(false,'Sign in required')})();
