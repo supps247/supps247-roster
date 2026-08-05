@@ -55,3 +55,7 @@ This build refreshes expired Supabase sessions automatically, sanitises state be
 ## Supplier statement reconciliation
 
 In **Accounts**, use **Upload supplier statement** to import PDF, CSV, XLSX or XLS files. Choose the supplier and outlet, then review matched, missing and mismatched invoices. The app adds only selected missing invoices, prevents duplicate invoice numbers for the same supplier/outlet, and records the source statement filename. PDF detection works best with text-based supplier statements; scanned statements may require Excel/CSV or manual entry.
+
+
+## Accounts date ordering
+Accounts are ordered by created date. Use the Accounts **Order by created date** control to switch between newest-first and oldest-first. The selected filters and totals continue to apply.
