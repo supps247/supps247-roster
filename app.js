@@ -100,7 +100,7 @@ function updateWeeklyCellLabel(cell){const p=cell.querySelector('.weekly-preset'
 function openWeeklyRoster(){renderWeeklyRosterGrid();$('weeklyRosterDialog').showModal()}
 function renderSelects(){const empOpts=state.employees.map(e=>`<option>${esc(e.name)}</option>`).join('');const locOpts=state.locations.map(x=>`<option>${esc(x)}</option>`).join('');$('shiftEmployee').innerHTML=empOpts;$('shiftOutlet').innerHTML=locOpts;$('weeklyRosterOutlet').innerHTML=locOpts;$('employeeOutlet').innerHTML=locOpts;$('rosterOutletFilter').innerHTML=`<option>All outlets</option>${locOpts}`;$('payrollOutletFilter').innerHTML=`<option>All outlets</option>${locOpts}`;$('rosterEmployeeFilter').innerHTML=`<option>All employees</option>${empOpts}`}
 function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
-function render(){renderSelects();$('weekLabel').textContent=weekText(currentWeek);$('payWeekLabel').textContent=weekText(payWeek);renderRoster();renderEmployees();renderPayroll();renderDashboard();renderStores();renderAccounts()}
+function render(){renderSelects();$('weekLabel').textContent=weekText(currentWeek);$('payWeekLabel').textContent=weekText(payWeek);renderRoster();renderEmployees();renderPayroll();renderDashboard();renderStores();renderAccounts();renderReports()}
 function renderRoster(){const outlet=$('rosterOutletFilter').value||'All outlets',emp=$('rosterEmployeeFilter').value||'All employees';const rows=state.shifts.filter(s=>inWeek(s.date,currentWeek)&&(outlet==='All outlets'||s.location===outlet)&&(emp==='All employees'||s.employee===emp)).sort((a,b)=>a.date.localeCompare(b.date)||a.start.localeCompare(b.start));$('rosterBody').innerHTML=rows.length?rows.map(s=>`<tr><td>${new Date(s.date+'T00:00:00').toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'})}</td><td>${esc(s.employee)}</td><td>${esc(s.location)}</td><td>${s.start}–${s.end}${outsideStoreHours(s)?'<br><span class="warning-text">Outside store hours</span>':''}</td><td>${s.breakMinutes||0} min</td><td>${hours(s).toFixed(2)}</td><td>${s.publicHoliday?'Public holiday':esc(s.shiftType||'Custom')}</td><td><div class="actions"><button class="action-btn" onclick="editShift('${s.id}')">Edit</button><button class="action-btn delete" onclick="deleteShift('${s.id}')">Delete</button></div></td></tr>`).join(''):`<tr><td colspan="8" class="empty">No shifts for this week.</td></tr>`}
 function renderEmployees(){$('employeesBody').innerHTML=state.employees.map(e=>`<tr><td><strong>${esc(e.name)}</strong></td><td>${esc(e.homeOutlet)}</td><td>${esc(e.employmentType)}</td><td>${money(e.baseRate)}</td><td>${e.satMultiplier}×</td><td>${e.sunMultiplier}×</td><td>${e.publicHolidayMultiplier}×</td><td>${e.superRate}%</td><td><div class="actions"><button class="action-btn" onclick="editEmployee('${encodeURIComponent(e.name)}')">Edit</button><button class="action-btn delete" onclick="deleteEmployee('${encodeURIComponent(e.name)}')">Delete</button></div></td></tr>`).join('')}
 function renderPayroll(){const rows=payrollRows(payWeek,$('payrollOutletFilter').value||'All outlets');$('payrollBody').innerHTML=rows.length?rows.map(r=>`<tr><td><strong>${esc(r.emp.name)}</strong><br><small>${money(r.emp.baseRate)}/hr</small></td><td>${r.weekday.toFixed(2)}</td><td>${r.sat.toFixed(2)}</td><td>${r.sun.toFixed(2)}</td><td>${r.ph.toFixed(2)}</td><td>${money(r.gross)}</td><td>${money(r.superAmt)}</td><td>${money(r.allowance)}</td><td><strong>${money(r.total)}</strong></td></tr>`).join(''):`<tr><td colspan="9" class="empty">No payroll data for this week.</td></tr>`;const sum=k=>rows.reduce((a,r)=>a+r[k],0);$('grossTotal').textContent=money(sum('gross'));$('superTotal').textContent=money(sum('superAmt'));$('allowanceTotal').textContent=money(sum('allowance'));$('labourTotal').textContent=money(sum('total'))}
@@ -223,3 +223,40 @@ $('copyWeekBtn').onclick=async()=>{const sourceStart=addDays(currentWeek,-7),sou
 $('exportRosterBtn').onclick=()=>{const rows=[['Date','Employee','Outlet','Start','Finish','Break minutes','Paid hours','Public holiday'],...state.shifts.filter(s=>inWeek(s.date,currentWeek)).map(s=>[s.date,s.employee,s.location,s.start,s.end,s.breakMinutes,hours(s).toFixed(2),s.publicHoliday?'Yes':'No'])];csvDownload(`supps247-roster-${dateKey(currentWeek)}.csv`,rows)};
 $('exportPayrollBtn').onclick=()=>{const rows=payrollRows(payWeek,$('payrollOutletFilter').value||'All outlets');csvDownload(`supps247-payroll-${dateKey(payWeek)}.csv`,[['Employee','Weekday hours','Saturday hours','Sunday hours','Public holiday hours','Base rate','Gross','Super','Allowance','Total labour cost'],...rows.map(r=>[r.emp.name,r.weekday.toFixed(2),r.sat.toFixed(2),r.sun.toFixed(2),r.ph.toFixed(2),r.emp.baseRate,r.gross.toFixed(2),r.superAmt.toFixed(2),r.allowance.toFixed(2),r.total.toFixed(2)])])};
 (async()=>{const {data:{session}}=await db.auth.getSession();if(session)showApp(session);else setStatus(false,'Sign in required')})();
+
+
+// Reports module
+function reportGroups(field){
+  const map=new Map();
+  for(const row of state.accounts||[]){
+    const key=String(row[field]||'Unknown').trim()||'Unknown';
+    if(!map.has(key))map.set(key,{name:key,count:0,total:0,outstanding:0});
+    const g=map.get(key);g.count++;g.total+=Number(row.amount||0);if(isOutstanding(row))g.outstanding+=Number(row.amount||0);
+  }
+  return [...map.values()].sort((a,b)=>b.total-a.total);
+}
+function renderReports(){
+  if(!$('supplierReportBody'))return;
+  const accounts=state.accounts||[];
+  const labour=payrollRows(currentWeek).reduce((sum,row)=>sum+Number(row.total||0),0);
+  $('reportSupplierSpend').textContent=money(accounts.reduce((sum,row)=>sum+Number(row.amount||0),0));
+  $('reportOutstanding').textContent=money(accounts.filter(isOutstanding).reduce((sum,row)=>sum+Number(row.amount||0),0));
+  const today=dateKey(new Date());
+  $('reportOverdueCount').textContent=accounts.filter(row=>isOutstanding(row)&&row.dueDate&&parseDateLoose(row.dueDate)<today).length;
+  $('reportLabour').textContent=money(labour);
+  const supplierRows=reportGroups('supplier');
+  const outletRows=reportGroups('outlet');
+  $('supplierReportBody').innerHTML=supplierRows.length?supplierRows.map(r=>`<tr><td><strong>${esc(r.name)}</strong></td><td>${r.count}</td><td>${money(r.total)}</td><td>${money(r.outstanding)}</td></tr>`).join(''):'<tr><td colspan="4" class="empty">No account data.</td></tr>';
+  $('outletReportBody').innerHTML=outletRows.length?outletRows.map(r=>`<tr><td><strong>${esc(r.name)}</strong></td><td>${r.count}</td><td>${money(r.total)}</td><td>${money(r.outstanding)}</td></tr>`).join(''):'<tr><td colspan="4" class="empty">No account data.</td></tr>';
+  const attention=accounts.filter(row=>isOutstanding(row)).sort((a,b)=>(parseDateLoose(a.dueDate)||'9999').localeCompare(parseDateLoose(b.dueDate)||'9999')).slice(0,100);
+  $('attentionReportBody').innerHTML=attention.length?attention.map(a=>`<tr><td><strong>${esc(a.invoiceNumber||'')}</strong></td><td>${esc(a.supplier||'')}</td><td>${esc(a.outlet||'')}</td><td>${esc(a.dueDate||'—')}</td><td>${money(a.amount)}</td><td><span class="status-pill status-${String(a.paymentStatus||'unconfirmed').toLowerCase().replaceAll(' ','-')}">${esc(a.paymentStatus||'Unconfirmed')}</span></td></tr>`).join(''):'<tr><td colspan="6" class="empty">No invoices require attention.</td></tr>';
+}
+function exportGroupedReport(field,fileName){
+  const rows=reportGroups(field);
+  csvDownload(fileName,[[field==='supplier'?'Supplier':'Outlet','Invoice count','Total spend','Outstanding'],...rows.map(r=>[r.name,r.count,r.total.toFixed(2),r.outstanding.toFixed(2)])]);
+}
+window.addEventListener('DOMContentLoaded',()=>{
+  const supplierBtn=$('exportSupplierReportBtn'),outletBtn=$('exportOutletReportBtn');
+  if(supplierBtn)supplierBtn.onclick=()=>exportGroupedReport('supplier',`supps247-supplier-report-${dateKey(new Date())}.csv`);
+  if(outletBtn)outletBtn.onclick=()=>exportGroupedReport('outlet',`supps247-outlet-report-${dateKey(new Date())}.csv`);
+});

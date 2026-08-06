@@ -23,21 +23,27 @@
   </section>
 
   <section id="appView" class="hidden">
-    <nav class="tabs">
-      <button class="tab active" data-view="dashboard">Dashboard</button>
-      <button class="tab" data-view="roster">Roster</button>
-      <button class="tab" data-view="employees">Employees</button>
-      <button class="tab" data-view="stores">Stores & Hours</button>
-      <button class="tab" data-view="payroll">Payroll</button>
-      <button class="tab" data-view="accounts">Accounts</button>
+    <nav class="tabs" aria-label="Main navigation">
+      <div class="nav-title">OPERATIONS</div>
+      <button class="tab active" data-view="dashboard"><span>⌂</span> Dashboard</button>
+      <button class="tab" data-view="roster"><span>▦</span> Weekly Roster</button>
+      <button class="tab" data-view="employees"><span>👥</span> Employees</button>
+      <button class="tab" data-view="stores"><span>⌂</span> Stores & Hours</button>
+      <button class="tab" data-view="payroll"><span>$</span> Payroll</button>
+      <button class="tab" data-view="accounts"><span>▤</span> Accounts</button>
+      <button class="tab" data-view="reports"><span>▥</span> Reports</button>
     </nav>
 
     <section id="dashboardView" class="view">
-      <div class="stats-grid">
-        <div class="card stat"><span>Employees</span><strong id="statEmployees">0</strong></div>
-        <div class="card stat"><span>Outlets</span><strong id="statOutlets">0</strong></div>
-        <div class="card stat"><span>Roster hours</span><strong id="statHours">0.0</strong></div>
-        <div class="card stat"><span>Estimated payroll</span><strong id="statPayroll">$0.00</strong></div>
+      <div class="dashboard-hero card">
+        <div><div class="eyebrow">SUPPS247 OPERATIONS PORTAL</div><h1>One place for rosters, payroll and supplier accounts.</h1><p class="muted">Live cloud data for managers and accountants.</p></div>
+        <div class="hero-actions"><button class="btn primary" onclick="document.querySelector('[data-view=roster]').click()">Build roster</button><button class="btn secondary" onclick="document.querySelector('[data-view=accounts]').click()">Review accounts</button></div>
+      </div>
+      <div class="stats-grid colourful-stats">
+        <div class="card stat stat-blue"><span>Employees</span><strong id="statEmployees">0</strong></div>
+        <div class="card stat stat-violet"><span>Outlets</span><strong id="statOutlets">0</strong></div>
+        <div class="card stat stat-orange"><span>Roster hours</span><strong id="statHours">0.0</strong></div>
+        <div class="card stat stat-green"><span>Estimated payroll</span><strong id="statPayroll">$0.00</strong></div>
       </div>
       <div class="card"><div class="section-head"><div><div class="eyebrow">THIS WEEK</div><h2>Outlet labour summary</h2></div></div><div id="outletSummary" class="summary-grid"></div></div>
     </section>
@@ -105,6 +111,20 @@
         <div class="bulk-payment-bar"><strong><span id="accountsSelectedCount">0</span> selected</strong><label>Status<select id="bulkPaymentStatus"><option value="">Keep current</option><option>Unconfirmed</option><option>Unpaid</option><option>Due</option><option>Scheduled</option><option>Part paid</option><option>Prepaid</option><option>Paid</option><option>Disputed</option><option>Credit received</option><option>Internal transfer</option><option>No payment required</option></select></label><label>Paid date<input id="bulkPaidDate" type="date"></label><label>Receipt / reference<input id="bulkReceiptNumber" placeholder="Optional"></label><button id="applyBulkPaymentBtn" class="btn primary">Update selected payments</button><button id="clearAccountSelectionBtn" class="btn secondary">Clear selection</button></div>
         <div class="table-wrap"><table><thead><tr><th><input id="selectAllAccounts" type="checkbox" title="Select all filtered invoices"></th><th>Invoice</th><th>Supplier</th><th>Outlet</th><th>Created date</th><th>Due</th><th>Qty</th><th>Amount</th><th>Payment</th><th>Paid date</th><th>Receipt</th><th></th></tr></thead><tbody id="accountsBody"></tbody><tfoot><tr class="accounts-total-row"><td></td><td colspan="5"><strong>Filtered total</strong> <span id="accountsFilteredCount" class="muted"></span></td><td id="accountsFilteredQty">0</td><td id="accountsFilteredTotal">$0.00</td><td colspan="4"></td></tr></tfoot></table></div>
       </div>
+    </section>
+
+    <section id="reportsView" class="view hidden">
+      <div class="stats-grid reports-stats">
+        <div class="card stat stat-blue"><span>Total supplier spend</span><strong id="reportSupplierSpend">$0.00</strong></div>
+        <div class="card stat stat-orange"><span>Outstanding invoices</span><strong id="reportOutstanding">$0.00</strong></div>
+        <div class="card stat stat-red"><span>Overdue invoices</span><strong id="reportOverdueCount">0</strong></div>
+        <div class="card stat stat-green"><span>This week labour</span><strong id="reportLabour">$0.00</strong></div>
+      </div>
+      <div class="report-grid">
+        <div class="card"><div class="section-head"><div><div class="eyebrow">SUPPLIERS</div><h2>Spend by supplier</h2></div><button id="exportSupplierReportBtn" class="btn secondary">Export CSV</button></div><div class="table-wrap"><table><thead><tr><th>Supplier</th><th>Invoices</th><th>Total spend</th><th>Outstanding</th></tr></thead><tbody id="supplierReportBody"></tbody></table></div></div>
+        <div class="card"><div class="section-head"><div><div class="eyebrow">OUTLETS</div><h2>Spend by outlet</h2></div><button id="exportOutletReportBtn" class="btn secondary">Export CSV</button></div><div class="table-wrap"><table><thead><tr><th>Outlet</th><th>Invoices</th><th>Total spend</th><th>Outstanding</th></tr></thead><tbody id="outletReportBody"></tbody></table></div></div>
+      </div>
+      <div class="card"><div class="section-head"><div><div class="eyebrow">PAYABLES</div><h2>Invoices requiring attention</h2></div></div><div class="table-wrap"><table><thead><tr><th>Invoice</th><th>Supplier</th><th>Outlet</th><th>Due date</th><th>Amount</th><th>Status</th></tr></thead><tbody id="attentionReportBody"></tbody></table></div></div>
     </section>
   </section>
 </main>

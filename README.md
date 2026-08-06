@@ -59,3 +59,8 @@ In **Accounts**, use **Upload supplier statement** to import PDF, CSV, XLSX or X
 
 ## Accounts date ordering
 Accounts are ordered by created date. Use the Accounts **Order by created date** control to switch between newest-first and oldest-first. The selected filters and totals continue to apply.
+
+
+## Operations Portal v2
+
+This build adds a colourful sidebar interface, refreshed dashboard, supplier and outlet reports, outstanding invoice attention list, report CSV exports, and improved mobile navigation while preserving the existing roster, payroll, accounts, receiving and Supabase workflows.
