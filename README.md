@@ -9,8 +9,8 @@ Cloud-based admin roster and payroll estimator connected to Supabase.
 - Full-day shifts can automatically use the selected outlet's opening hours
 - Warning and confirmation when a roster shift is outside published trading hours
 - Weekly roster, employee pay settings and payroll estimate
-- Saturday, Sunday and public-holiday multipliers
-- Super and weekly allowance estimates
+- Saturday and Sunday hours paid at the normal base rate
+- Weekly allowance estimates
 - Roster and payroll CSV exports
 - Supabase authentication, cloud persistence and real-time updates
 
@@ -73,3 +73,8 @@ This build fixes local-date handling so Monday through Sunday are all included i
 ## Weekend rates and breaks
 
 Saturday and Sunday hours now use the employee's normal base hourly rate with no weekend multiplier. Roster and payroll hours no longer deduct an automatic 30-minute unpaid break; full shift duration is counted. Public-holiday multipliers remain available.
+
+
+## Payroll simplification
+
+Superannuation and public-holiday loading have been removed from payroll calculations and exports. All rostered hours use the employee base hourly rate, with saved weekly allowances added separately.

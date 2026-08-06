@@ -66,7 +66,7 @@
     <section id="employeesView" class="view hidden">
       <div class="card">
         <div class="section-head"><div><div class="eyebrow">EMPLOYEES</div><h2>Pay settings</h2></div><button id="addEmployeeBtn" class="btn primary">+ Add employee</button></div>
-        <div class="table-wrap"><table><thead><tr><th>Name</th><th>Home outlet</th><th>Employment</th><th>Base rate</th><th>Sat</th><th>Sun</th><th>Public holiday</th><th>Super</th><th></th></tr></thead><tbody id="employeesBody"></tbody></table></div>
+        <div class="table-wrap"><table><thead><tr><th>Name</th><th>Home outlet</th><th>Employment</th><th>Base rate</th><th>Sat</th><th>Sun</th><th></th></tr></thead><tbody id="employeesBody"></tbody></table></div>
       </div>
     </section>
 
@@ -83,8 +83,8 @@
       <div class="card">
         <div class="section-head wrap"><div><div class="eyebrow">PAYROLL</div><h2>Weekly payroll estimate</h2></div><div class="week-nav"><button id="payPrevWeek" class="btn secondary">←</button><span id="payWeekLabel" class="pill"></span><button id="payNextWeek" class="btn secondary">→</button></div></div>
         <div class="toolbar"><label>Outlet<select id="payrollOutletFilter"></select></label><button id="exportPayrollBtn" class="btn primary">Export payroll CSV</button></div>
-        <div class="pay-cards"><div class="mini-card"><span>Gross wages</span><strong id="grossTotal">$0.00</strong></div><div class="mini-card"><span>Super</span><strong id="superTotal">$0.00</strong></div><div class="mini-card"><span>Allowances</span><strong id="allowanceTotal">$0.00</strong></div><div class="mini-card"><span>Total labour cost</span><strong id="labourTotal">$0.00</strong></div></div>
-        <div class="table-wrap"><table><thead><tr><th>Employee</th><th>Weekday hrs</th><th>Sat hrs</th><th>Sun hrs</th><th>PH hrs</th><th>Gross</th><th>Super</th><th>Allowance</th><th>Total cost</th></tr></thead><tbody id="payrollBody"></tbody></table></div>
+        <div class="pay-cards"><div class="mini-card"><span>Gross wages</span><strong id="grossTotal">$0.00</strong></div><div class="mini-card"><span>Allowances</span><strong id="allowanceTotal">$0.00</strong></div><div class="mini-card"><span>Total labour cost</span><strong id="labourTotal">$0.00</strong></div></div>
+        <div class="table-wrap"><table><thead><tr><th>Employee</th><th>Weekday hrs</th><th>Sat hrs</th><th>Sun hrs</th><th>Gross</th><th>Allowance</th><th>Total cost</th></tr></thead><tbody id="payrollBody"></tbody></table></div>
         <p class="notice">Payroll figures are estimates based on rostered hours and saved rates. Confirm awards, overtime, tax, leave, and payroll compliance with your accountant before paying staff.</p>
       </div>
     </section>
@@ -153,7 +153,7 @@
 <dialog id="shiftDialog"><form id="shiftForm" class="dialog-card">
   <div class="section-head"><h2 id="shiftDialogTitle">Add shift</h2><button type="button" class="icon" data-close="shiftDialog">×</button></div>
   <input id="shiftId" type="hidden">
-  <div class="form-grid"><label>Employee<select id="shiftEmployee" required></select></label><label>Outlet<select id="shiftOutlet" required></select></label><label>Date<input id="shiftDate" type="date" required></label><label>Shift type<select id="shiftType"><option>Custom</option><option>Full day</option><option>Half AM</option><option>Half PM</option></select></label><label>Start<input id="shiftStart" type="time" required></label><label>Finish<input id="shiftEnd" type="time" required></label><div class="full store-hours-box"><span id="storeHoursHint"></span><button id="useStoreHoursBtn" type="button" class="btn secondary small">Use store opening hours</button></div><input id="shiftBreak" type="hidden" value="0"><label class="check"><input id="shiftPublicHoliday" type="checkbox"> Public holiday shift</label><label class="full">Notes<input id="shiftNotes" type="text"></label></div>
+  <div class="form-grid"><label>Employee<select id="shiftEmployee" required></select></label><label>Outlet<select id="shiftOutlet" required></select></label><label>Date<input id="shiftDate" type="date" required></label><label>Shift type<select id="shiftType"><option>Custom</option><option>Full day</option><option>Half AM</option><option>Half PM</option></select></label><label>Start<input id="shiftStart" type="time" required></label><label>Finish<input id="shiftEnd" type="time" required></label><div class="full store-hours-box"><span id="storeHoursHint"></span><button id="useStoreHoursBtn" type="button" class="btn secondary small">Use store opening hours</button></div><input id="shiftBreak" type="hidden" value="0"><input id="shiftPublicHoliday" type="hidden"><label class="full">Notes<input id="shiftNotes" type="text"></label></div>
   <div class="dialog-actions"><button type="button" class="btn secondary" data-close="shiftDialog">Cancel</button><button class="btn primary" type="submit">Save shift</button></div>
 </form></dialog>
 
@@ -169,7 +169,7 @@
 <dialog id="employeeDialog"><form id="employeeForm" class="dialog-card">
   <div class="section-head"><h2 id="employeeDialogTitle">Employee</h2><button type="button" class="icon" data-close="employeeDialog">×</button></div>
   <input id="employeeOriginalName" type="hidden">
-  <div class="form-grid"><label>Name<input id="employeeName" required></label><label>Home outlet<select id="employeeOutlet"></select></label><label>Employment type<select id="employeeType"><option>Casual</option><option>Part Time</option><option>Full Time</option></select></label><label>Base hourly rate ($)<input id="employeeRate" type="number" min="0" step="0.01" value="30"></label><label>Saturday rate<input id="employeeSat" type="number" value="1" disabled></label><label>Sunday rate<input id="employeeSun" type="number" value="1" disabled></label><label>Public holiday multiplier<input id="employeePH" type="number" min="1" step="0.01" value="2.5"></label><label>Super rate (%)<input id="employeeSuper" type="number" min="0" step="0.1" value="12"></label><label>Weekly allowance ($)<input id="employeeAllowance" type="number" min="0" step="0.01" value="0"></label></div>
+  <div class="form-grid"><label>Name<input id="employeeName" required></label><label>Home outlet<select id="employeeOutlet"></select></label><label>Employment type<select id="employeeType"><option>Casual</option><option>Part Time</option><option>Full Time</option></select></label><label>Base hourly rate ($)<input id="employeeRate" type="number" min="0" step="0.01" value="30"></label><label>Saturday rate<input id="employeeSat" type="number" value="1" disabled></label><label>Sunday rate<input id="employeeSun" type="number" value="1" disabled></label><label>Weekly allowance ($)<input id="employeeAllowance" type="number" min="0" step="0.01" value="0"></label></div>
   <div class="dialog-actions"><button type="button" class="btn secondary" data-close="employeeDialog">Cancel</button><button class="btn primary" type="submit">Save employee</button></div>
 </form></dialog>
 
