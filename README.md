@@ -68,3 +68,8 @@ This build adds a colourful sidebar interface, refreshed dashboard, supplier and
 ## Seven-day roster and payroll fix
 
 This build fixes local-date handling so Monday through Sunday are all included in roster and payroll calculations. It also recognises older weekly-builder shifts that were saved one calendar day early by the previous UTC date conversion and displays/calculates them on their intended day. Newly created or edited shifts use the corrected local date format.
+
+
+## Weekend rates and breaks
+
+Saturday and Sunday hours now use the employee's normal base hourly rate with no weekend multiplier. Roster and payroll hours no longer deduct an automatic 30-minute unpaid break; full shift duration is counted. Public-holiday multipliers remain available.
