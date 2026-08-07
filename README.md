@@ -78,3 +78,8 @@ Saturday and Sunday hours now use the employee's normal base hourly rate with no
 ## Payroll simplification
 
 Superannuation and public-holiday loading have been removed from payroll calculations and exports. All rostered hours use the employee base hourly rate, with saved weekly allowances added separately.
+
+
+## Weekly roster authoritative date fix
+
+Weekly roster dates are now stored and read exactly as selected (Monday through Sunday), without any legacy one-day date shifting. Weekly saves include dateVersion 2, Off days stay Off, Half PM stays Half PM, and Full day uses zero break minutes. This also corrects previously displayed Tuesday-shifted weekly entries because the app now uses the saved calendar date directly.
