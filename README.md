@@ -83,3 +83,8 @@ Superannuation and public-holiday loading have been removed from payroll calcula
 ## Weekly roster authoritative date fix
 
 Weekly roster dates are now stored and read exactly as selected (Monday through Sunday), without any legacy one-day date shifting. Weekly saves include dateVersion 2, Off days stay Off, Half PM stays Half PM, and Full day uses zero break minutes. This also corrects previously displayed Tuesday-shifted weekly entries because the app now uses the saved calendar date directly.
+
+
+## Supplier PDF parsing fix
+
+Supplier PDF import now uses strict labelled fields for invoice number, invoice date, due date and total including GST. Unknown fields are left blank instead of guessed from the filename. The review screen warns about fields that were not confidently detected and flags possible duplicate invoice numbers before saving.

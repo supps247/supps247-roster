@@ -144,21 +144,42 @@ function normaliseInvoiceDate(value){
 }
 function firstMatch(text,patterns){for(const p of patterns){const m=text.match(p);if(m&&m[1])return m[1].trim()}return ''}
 function extractAmount(text){
-  const labels=[/\b(?:invoice\s+total|amount\s+due|balance\s+due|total\s+due|grand\s+total|total\s+aud)\s*[:$ ]+\$?\s*([0-9][0-9,]*\.\d{2})/ig,/\btotal\s*[:$ ]+\$?\s*([0-9][0-9,]*\.\d{2})/ig];
-  for(const re of labels){let found=[],m;while((m=re.exec(text)))found.push(Number(m[1].replace(/,/g,'')));if(found.length)return found[found.length-1]}
+  const patterns=[
+    /\btotal\s+inc\.?\s*gst\s*[:$ ]*\$?\s*([0-9][0-9,]*\.\d{2})/ig,
+    /\btotal\s+(?:incl\.?|including)\s*gst\s*[:$ ]*\$?\s*([0-9][0-9,]*\.\d{2})/ig,
+    /\b(?:invoice\s+total|amount\s+due|balance\s+due|total\s+due|grand\s+total|total\s+aud)\s*[:$ ]*\$?\s*([0-9][0-9,]*\.\d{2})/ig,
+    /\btotal\s*[:$ ]+\$?\s*([0-9][0-9,]*\.\d{2})/ig
+  ];
+  for(const re of patterns){let found=[],m;while((m=re.exec(text)))found.push(Number(m[1].replace(/,/g,'')));if(found.length)return found[found.length-1]}
   return 0;
+}
+function extractInvoiceNumber(text){
+  return firstMatch(text,[
+    /\btax\s+invoice\s+no\.?\s*[:#-]?\s*([A-Z0-9][A-Z0-9\-\/]{2,30})\b/i,
+    /\binvoice\s+(?:number|no\.?)\s*[:#-]?\s*([A-Z0-9][A-Z0-9\-\/]{2,30})\b/i,
+    /\binvoice\s*#\s*([A-Z0-9][A-Z0-9\-\/]{2,30})\b/i,
+    /\binv\s*#\s*([A-Z0-9][A-Z0-9\-\/]{2,30})\b/i
+  ]);
 }
 function guessSupplier(text,fileName){
   const known=[...accountSuppliers(),...PREPAID_SUPPLIER_ALIASES,'GLOBAL NUTRITION','NUTRITION SYSTEMS','ATP','GLANBIA','IOVATE','PRIMABOLICS','DYNAMIC DISTRIBUTION','RAPID SUPPLEMENTS','NEXT GENERATION','INTERNATIONAL PROTEIN','FIBRE BOOST','DR. HYDRATE','AXE & SLEDGE','PICKLE JUICE','ZAYN'];
   const upper=text.toUpperCase();const match=known.sort((a,b)=>b.length-a.length).find(n=>upper.includes(String(n).toUpperCase()));
-  if(match)return match;
-  return String(fileName||'').replace(/\.pdf$/i,'').replace(/[_-]+/g,' ').replace(/\b(invoice|inv|statement|tax)\b/ig,' ').replace(/\s+/g,' ').trim();
+  if(match){
+    const existing=accountSuppliers().find(s=>normaliseKey(s)===normaliseKey(match));
+    return existing||String(match).replace(/\b\w/g,c=>c.toUpperCase());
+  }
+  return '';
 }
 function guessOutlet(text){
   const upper=text.toUpperCase();
-  const aliases=[['Springvale (Head Office)',['SPRINGVALE']],['South Yarra (Chapel Street)',['SOUTH YARRA','CHAPEL STREET']],['Chirnside Park',['CHIRNSIDE']],...LOCATIONS.filter(x=>!['Springvale (Head Office)','South Yarra (Chapel Street)','Chirnside Park'].includes(x)).map(x=>[x,[x.toUpperCase()]])];
+  const aliases=[['Springvale (Head Office)',['SUPPS 247 SPRINGVALE','SUPPS247 SPRINGVALE','SPRINGVALE']],['South Yarra (Chapel Street)',['SUPPS 247 SOUTH YARRA','SUPPS247 SOUTH YARRA','SOUTH YARRA','CHAPEL STREET']],['Chirnside Park',['SUPPS 247 CHIRNSIDE','SUPPS247 CHIRNSIDE','CHIRNSIDE']],...LOCATIONS.filter(x=>!['Springvale (Head Office)','South Yarra (Chapel Street)','Chirnside Park'].includes(x)).map(x=>[x,[`SUPPS 247 ${x.toUpperCase()}`,`SUPPS247 ${x.toUpperCase()}`,x.toUpperCase()]])];
   for(const [outlet,names] of aliases)if(names.some(n=>upper.includes(n)))return outlet;
   return '';
+}
+function extractInvoiceQuantity(text){
+  const lineMatches=[...text.matchAll(/\b(\d+(?:\.\d+)?)\s+(?:EACH|EA|UNIT|UNITS|PCS|PC)\b/ig)];
+  if(lineMatches.length===1)return Number(lineMatches[0][1])||0;
+  return 0;
 }
 async function readPdfText(file){
   const pdfjsLib=await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs');
@@ -172,12 +193,22 @@ async function importSupplierPdf(file){
   try{
     const text=await readPdfText(file);
     if(!text||text.length<30)throw new Error('No selectable text was found. This may be a scanned image PDF.');
-    const invoiceNumber=firstMatch(text,[/\b(?:tax\s+invoice|invoice)\s*(?:number|no\.?|#)?\s*[:#-]?\s*([A-Z0-9][A-Z0-9\-\/ ]{2,30})/i,/\b(?:invoice\s*#|inv\s*#)\s*([A-Z0-9\-\/]+)/i]);
-    const invoiceDateRaw=firstMatch(text,[/\b(?:invoice\s+date|date\s+issued|issued\s+date)\s*:?\s*([0-9]{1,2}[\/\.\-][0-9]{1,2}[\/\.\-][0-9]{2,4})/i,/\b(?:invoice\s+date|date\s+issued)\s*:?\s*([0-9]{1,2}\s+[A-Za-z]{3,9}\s+[0-9]{2,4})/i]);
-    const dueDateRaw=firstMatch(text,[/\b(?:due\s+date|payment\s+due)\s*:?\s*([0-9]{1,2}[\/\.\-][0-9]{1,2}[\/\.\-][0-9]{2,4})/i,/\b(?:due\s+date|payment\s+due)\s*:?\s*([0-9]{1,2}\s+[A-Za-z]{3,9}\s+[0-9]{2,4})/i]);
-    const supplier=guessSupplier(text,file.name),outlet=guessOutlet(text),amount=extractAmount(text);
-    $('invoiceNumber').value=invoiceNumber||file.name.replace(/\.pdf$/i,'');$('invoiceSupplier').value=supplier;$('invoiceOutlet').value=outlet;$('invoiceReceivedDate').value=normaliseInvoiceDate(invoiceDateRaw)||dateKey(new Date());$('invoiceDueDate').value=normaliseInvoiceDate(dueDateRaw);$('invoiceAmount').value=amount||0;$('invoicePaymentStatus').value=applySupplierPaymentDefaults({supplier,paymentStatus:'Unconfirmed'}).paymentStatus;$('invoiceNotes').value=`Imported from supplier PDF: ${file.name}`;
-    $('pdfImportStatus').innerHTML=`PDF read successfully. Please check the highlighted fields before saving.<br><small>${esc(file.name)} · ${text.length.toLocaleString()} characters extracted</small>`;
+    const invoiceNumber=extractInvoiceNumber(text);
+    const invoiceDateRaw=firstMatch(text,[/\btax\s+invoice\s+date\s*:?[ ]*([0-9]{1,2}[\/.\-][0-9]{1,2}[\/.\-][0-9]{2,4})/i,/\b(?:invoice\s+date|date\s+issued|issued\s+date)\s*:?[ ]*([0-9]{1,2}[\/.\-][0-9]{1,2}[\/.\-][0-9]{2,4})/i,/\b(?:invoice\s+date|date\s+issued)\s*:?[ ]*([0-9]{1,2}\s+[A-Za-z]{3,9}\s+[0-9]{2,4})/i]);
+    const dueDateRaw=firstMatch(text,[/\bdue\s+date\s*:?[ ]*([0-9]{1,2}[\/.\-][0-9]{1,2}[\/.\-][0-9]{2,4})/i,/\bpayment\s+due\s*:?[ ]*([0-9]{1,2}[\/.\-][0-9]{1,2}[\/.\-][0-9]{2,4})/i,/\b(?:due\s+date|payment\s+due)\s*:?[ ]*([0-9]{1,2}\s+[A-Za-z]{3,9}\s+[0-9]{2,4})/i]);
+    const supplier=guessSupplier(text,file.name),outlet=guessOutlet(text),amount=extractAmount(text),quantity=extractInvoiceQuantity(text);
+    $('invoiceNumber').value=invoiceNumber||'';
+    $('invoiceSupplier').value=supplier;
+    $('invoiceOutlet').value=outlet;
+    $('invoiceReceivedDate').value=normaliseInvoiceDate(invoiceDateRaw);
+    $('invoiceDueDate').value=normaliseInvoiceDate(dueDateRaw);
+    $('invoiceQuantity').value=quantity||0;
+    $('invoiceAmount').value=amount||0;
+    $('invoicePaymentStatus').value=applySupplierPaymentDefaults({supplier,paymentStatus:'Unconfirmed'}).paymentStatus;
+    $('invoiceNotes').value=`Imported from supplier PDF: ${file.name}`;
+    const missing=[];if(!invoiceNumber)missing.push('invoice number');if(!supplier)missing.push('supplier');if(!outlet)missing.push('outlet');if(!normaliseInvoiceDate(invoiceDateRaw))missing.push('invoice date');if(!normaliseInvoiceDate(dueDateRaw))missing.push('due date');if(!amount)missing.push('total amount');
+    const duplicate=invoiceNumber&&(state.accounts||[]).find(a=>normaliseKey(a.invoiceNumber)===normaliseKey(invoiceNumber)&&(!supplier||normaliseKey(a.supplier)===normaliseKey(supplier)));
+    $('pdfImportStatus').innerHTML=`<strong>PDF read.</strong> Review every field before saving.${missing.length?`<br><span class="warning-text">Not confidently detected: ${esc(missing.join(', '))}.</span>`:''}${duplicate?`<br><span class="warning-text">Possible duplicate: this invoice number already exists in Accounts.</span>`:''}<br><small>${esc(file.name)} · ${text.length.toLocaleString()} characters extracted</small>`;
   }catch(err){console.error(err);$('pdfImportStatus').innerHTML=`Could not read this PDF automatically: ${esc(err.message)}<br><small>You can still enter the details manually, or upload a text-based PDF.</small>`;toast('PDF needs manual review')}
 }
 
