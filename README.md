@@ -88,3 +88,8 @@ Weekly roster dates are now stored and read exactly as selected (Monday through 
 ## Supplier PDF parsing fix
 
 Supplier PDF import now uses strict labelled fields for invoice number, invoice date, due date and total including GST. Unknown fields are left blank instead of guessed from the filename. The review screen warns about fields that were not confidently detected and flags possible duplicate invoice numbers before saving.
+
+
+## Lightspeed accounts update — 11 August 2026
+
+Added 39 received purchase orders supplied from Lightspeed to Accounts. Matching records are merged by invoice number, supplier and outlet; due dates and received quantities are filled from the new Lightspeed data when older saved rows are missing them. Prepaid supplier rules remain active.
