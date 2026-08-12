@@ -102,6 +102,11 @@
           <label>Outlet<select id="accountsOutletFilter"></select></label>
           <label>Supplier<select id="accountsSupplierFilter"></select></label>
           <label>Payment status<select id="accountsStatusFilter"><option>All statuses</option><option>Unconfirmed</option><option>Unpaid</option><option>Due</option><option>Scheduled</option><option>Part paid</option><option>Prepaid</option><option>Paid</option><option>Disputed</option><option>Credit received</option><option>Internal transfer</option><option>No payment required</option></select></label>
+          <label>Date by<select id="accountsDateField"><option value="receivedDate">Created date</option><option value="paidDate">Paid date</option><option value="dueDate">Due date</option></select></label>
+          <label>From<input id="accountsDateFrom" type="date"></label>
+          <label>To<input id="accountsDateTo" type="date"></label>
+          <button id="accountsLastMonthBtn" class="btn secondary" type="button">Paid last month</button>
+          <button id="accountsClearDatesBtn" class="btn secondary" type="button">Clear dates</button>
           <label>Order by created date<select id="accountsDateSort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option></select></label>
           <label>Search<input id="accountsSearch" placeholder="Invoice or supplier"></label>
           <button id="importReceivingBtn" class="btn secondary">Import receiving file</button>

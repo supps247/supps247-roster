@@ -98,3 +98,7 @@ Added 39 received purchase orders supplied from Lightspeed to Accounts. Matching
 ## Lightspeed completeness update — 11 August 2026
 
 Added/corrected the remaining Lightspeed received purchase orders supplied through 24 July 2026, including due dates and quantities where shown. Existing account payment edits are preserved when records match by invoice/order number, supplier and outlet. Prepaid and internal-transfer rules continue to apply.
+
+## Accounts date range filter
+
+Accounts now supports filtering by created date, paid date, or due date with From/To controls. Use **Paid last month** to automatically select Paid invoices and the previous calendar month; the filtered total at the bottom then shows how much was paid in that period.
