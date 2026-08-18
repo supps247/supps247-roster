@@ -114,3 +114,7 @@ Payroll now opens on the previous completed week and calculates one employee per
 ## Lightspeed workbook update — 18 August 2026
 
 Imported 74 received-order rows from `versel.xlsx`. Existing and incoming account rows are de-duplicated using a canonical invoice/order number + supplier + outlet key, so variants such as `INV-249820`, `INV 249820`, and `249820` do not appear twice for the same supplier/outlet. Existing paid/prepaid/payment-reference edits are preserved while newer quantity, received-date, due-date, and non-zero amount data is merged in.
+
+## Permanent Accounts deletion fix
+
+Deleting an Accounts invoice now stores a persistent deletion marker in Supabase state. This prevents built-in/imported seed records from being recreated by the normal data merge after refresh or login. Re-adding the same invoice manually clears the marker.
