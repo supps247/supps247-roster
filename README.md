@@ -119,7 +119,6 @@ Imported 74 received-order rows from `versel.xlsx`. Existing and incoming accoun
 
 Deleting an Accounts invoice now stores a persistent deletion marker in Supabase state. This prevents built-in/imported seed records from being recreated by the normal data merge after refresh or login. Re-adding the same invoice manually clears the marker.
 
+## Accounts invoice edit/delete identity fix — 18 August 2026
 
-## Primabolics Accounts completion — 18 August 2026
-
-Added/reconciled 22 Primabolics received orders supplied from Lightspeed. Invoice numbers are stored without the leading INV prefix. Existing matching rows are merged by canonical invoice + supplier + outlet. Previously deleted matching rows are restored once for this requested update; future manual deletions remain permanent. Supplier payment-term logic remains active.
+Editing an invoice number, supplier, outlet, or date now updates the same account record instead of allowing the original imported seed row to reappear as a second line. When the identity key changes, the original seed record is suppressed while the corrected row keeps its record ID. Existing duplicate rows caused by prior edits are also collapsed when a manually corrected row has the same supplier, outlet, received date, quantity, and amount as an imported row. Deleting an invoice now removes only the selected record ID rather than every row that shares the same canonical invoice key.
