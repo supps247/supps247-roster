@@ -109,3 +109,8 @@ Accounts now supports filtering by created date, paid date, or due date with Fro
 Outstanding invoices with status **Due**, **Unpaid** or **Unconfirmed** now calculate due dates from the received date using these terms: Global Nutrition and Primabolics 45 days; Glanbia, Iovate, International Protein and ATP 30 days; Dynamic Distribution 7 days; Rapid Supplements 15 days. If the calculated date would already be in the past, the app uses today's date instead.
 
 Payroll now opens on the previous completed week and calculates one employee per outlet across the outlet's full saved opening hours at a flat **$28/hour**, with no break deduction. The payroll CSV export includes outlet and assigned employee.
+
+
+## Lightspeed workbook update — 18 August 2026
+
+Imported 74 received-order rows from `versel.xlsx`. Existing and incoming account rows are de-duplicated using a canonical invoice/order number + supplier + outlet key, so variants such as `INV-249820`, `INV 249820`, and `249820` do not appear twice for the same supplier/outlet. Existing paid/prepaid/payment-reference edits are preserved while newer quantity, received-date, due-date, and non-zero amount data is merged in.
