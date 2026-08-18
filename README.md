@@ -102,3 +102,10 @@ Added/corrected the remaining Lightspeed received purchase orders supplied throu
 ## Accounts date range filter
 
 Accounts now supports filtering by created date, paid date, or due date with From/To controls. Use **Paid last month** to automatically select Paid invoices and the previous calendar month; the filtered total at the bottom then shows how much was paid in that period.
+
+
+## Supplier payment terms and previous-week store payroll
+
+Outstanding invoices with status **Due**, **Unpaid** or **Unconfirmed** now calculate due dates from the received date using these terms: Global Nutrition and Primabolics 45 days; Glanbia, Iovate, International Protein and ATP 30 days; Dynamic Distribution 7 days; Rapid Supplements 15 days. If the calculated date would already be in the past, the app uses today's date instead.
+
+Payroll now opens on the previous completed week and calculates one employee per outlet across the outlet's full saved opening hours at a flat **$28/hour**, with no break deduction. The payroll CSV export includes outlet and assigned employee.

@@ -82,10 +82,10 @@
     <section id="payrollView" class="view hidden">
       <div class="card">
         <div class="section-head wrap"><div><div class="eyebrow">PAYROLL</div><h2>Weekly payroll estimate</h2></div><div class="week-nav"><button id="payPrevWeek" class="btn secondary">←</button><span id="payWeekLabel" class="pill"></span><button id="payNextWeek" class="btn secondary">→</button></div></div>
-        <div class="toolbar"><label>Outlet<select id="payrollOutletFilter"></select></label><button id="exportPayrollBtn" class="btn primary">Export payroll CSV</button></div>
+        <div class="toolbar"><label>Outlet<select id="payrollOutletFilter"></select></label><span class="pill">Store-hours payroll · $28/hr · previous week</span><button id="exportPayrollBtn" class="btn primary">Export payroll CSV</button></div>
         <div class="pay-cards"><div class="mini-card"><span>Gross wages</span><strong id="grossTotal">$0.00</strong></div><div class="mini-card"><span>Allowances</span><strong id="allowanceTotal">$0.00</strong></div><div class="mini-card"><span>Total labour cost</span><strong id="labourTotal">$0.00</strong></div></div>
-        <div class="table-wrap"><table><thead><tr><th>Employee</th><th>Weekday hrs</th><th>Sat hrs</th><th>Sun hrs</th><th>Gross</th><th>Allowance</th><th>Total cost</th></tr></thead><tbody id="payrollBody"></tbody></table></div>
-        <p class="notice">Payroll figures are estimates based on rostered hours and saved rates. Confirm awards, overtime, tax, leave, and payroll compliance with your accountant before paying staff.</p>
+        <div class="table-wrap"><table><thead><tr><th>Outlet</th><th>Employee</th><th>Weekday hrs</th><th>Sat hrs</th><th>Sun hrs</th><th>Gross</th><th>Total cost</th></tr></thead><tbody id="payrollBody"></tbody></table></div>
+        <p class="notice">Payroll is calculated from each store’s full published opening hours for the selected week, using one assigned employee per outlet at $28/hour with no break deduction. Confirm actual hours and payroll compliance before paying staff.</p>
       </div>
     </section>
 
