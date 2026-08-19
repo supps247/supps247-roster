@@ -122,3 +122,12 @@ Deleting an Accounts invoice now stores a persistent deletion marker in Supabase
 ## Accounts invoice edit/delete identity fix — 18 August 2026
 
 Editing an invoice number, supplier, outlet, or date now updates the same account record instead of allowing the original imported seed row to reappear as a second line. When the identity key changes, the original seed record is suppressed while the corrected row keeps its record ID. Existing duplicate rows caused by prior edits are also collapsed when a manually corrected row has the same supplier, outlet, received date, quantity, and amount as an imported row. Deleting an invoice now removes only the selected record ID rather than every row that shares the same canonical invoice key.
+
+## Point Cook sales & stock — 19 August 2026
+
+Added a dedicated **Point Cook Stock** workspace for product-level sales, purchasing and inventory analysis. Upload Lightspeed CSV/XLSX exports for products/current stock, sales and purchases. The module de-duplicates transaction imports, groups products into practical supplement categories, shows purchased units, sold units, on-hand stock, sales value, low/out-of-stock status, category performance and top sellers, and can export the filtered stock view to CSV. Product and movement data is saved inside the existing Supabase `roster_state` JSON, so no SQL migration is required.
+
+
+## Point Cook April 2026 purchase data
+
+Loaded 17 Lightspeed Point Cook purchase-order CSV exports (POI-481 through POI-511 supplied in this chat). The app now starts with 148 unique Point Cook products, 715 received purchase units and $24,018.32 of recorded supply cost from those files. The CSV exports do not contain the exact April purchase date, so movements are tagged to April 2026 and retain the original PO number/source filename. The exported `stock` field is also retained as the product on-hand figure from the source files.

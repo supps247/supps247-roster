@@ -31,6 +31,7 @@
       <button class="tab" data-view="stores"><span>⌂</span> Stores & Hours</button>
       <button class="tab" data-view="payroll"><span>$</span> Payroll</button>
       <button class="tab" data-view="accounts"><span>▤</span> Accounts</button>
+       <button class="tab" data-view="pointCookStock"><span>▦</span> Point Cook Stock</button>
       <button class="tab" data-view="reports"><span>▥</span> Reports</button>
     </nav>
 
@@ -115,6 +116,29 @@
         </div>
         <div class="bulk-payment-bar"><strong><span id="accountsSelectedCount">0</span> selected</strong><label>Status<select id="bulkPaymentStatus"><option value="">Keep current</option><option>Unconfirmed</option><option>Unpaid</option><option>Due</option><option>Scheduled</option><option>Part paid</option><option>Prepaid</option><option>Paid</option><option>Disputed</option><option>Credit received</option><option>Internal transfer</option><option>No payment required</option></select></label><label>Paid date<input id="bulkPaidDate" type="date"></label><label>Receipt / reference<input id="bulkReceiptNumber" placeholder="Optional"></label><button id="applyBulkPaymentBtn" class="btn primary">Update selected payments</button><button id="clearAccountSelectionBtn" class="btn secondary">Clear selection</button></div>
         <div class="table-wrap"><table><thead><tr><th><input id="selectAllAccounts" type="checkbox" title="Select all filtered invoices"></th><th>Invoice</th><th>Supplier</th><th>Outlet</th><th>Created date</th><th>Due</th><th>Qty</th><th>Amount</th><th>Payment</th><th>Paid date</th><th>Receipt</th><th></th></tr></thead><tbody id="accountsBody"></tbody><tfoot><tr class="accounts-total-row"><td></td><td colspan="5"><strong>Filtered total</strong> <span id="accountsFilteredCount" class="muted"></span></td><td id="accountsFilteredQty">0</td><td id="accountsFilteredTotal">$0.00</td><td colspan="4"></td></tr></tfoot></table></div>
+      </div>
+    </section>
+
+
+    <section id="pointCookStockView" class="view hidden">
+      <div class="dashboard-hero card stock-hero">
+        <div><div class="eyebrow">POINT COOK · SALES & INVENTORY</div><h1>See what is selling, what you are buying and what is left in stock.</h1><p class="muted">Import Lightspeed exports for Point Cook. Products are grouped into practical supplement categories automatically.</p></div>
+        <div class="hero-actions"><button id="uploadStockProductsBtn" class="btn primary">Upload products / stock</button><input id="stockProductsInput" type="file" accept=".csv,.xlsx,.xls" class="hidden"><button id="uploadStockSalesBtn" class="btn secondary">Upload sales</button><input id="stockSalesInput" type="file" accept=".csv,.xlsx,.xls" class="hidden"><button id="uploadStockPurchasesBtn" class="btn secondary">Upload purchases</button><input id="stockPurchasesInput" type="file" accept=".csv,.xlsx,.xls" class="hidden"></div>
+      </div>
+      <div class="stats-grid stock-stats">
+        <div class="card stat stat-blue"><span>Products / SKUs</span><strong id="pcSkuCount">0</strong></div>
+        <div class="card stat stat-green"><span>Units in stock</span><strong id="pcUnitsStock">0</strong></div>
+        <div class="card stat stat-violet"><span>Units sold</span><strong id="pcUnitsSold">0</strong></div>
+        <div class="card stat stat-orange"><span>Units purchased</span><strong id="pcPurchaseUnits">0</strong></div>
+      </div>
+      <div class="card">
+        <div class="section-head wrap"><div><div class="eyebrow">PRODUCT PERFORMANCE</div><h2>Point Cook product stock</h2></div><button id="exportPointCookStockBtn" class="btn secondary">Export CSV</button></div>
+        <div class="toolbar accounts-toolbar"><label>Category<select id="stockCategoryFilter"><option>All categories</option></select></label><label>Stock status<select id="stockStatusFilter"><option>All stock</option><option>In stock</option><option>Low stock</option><option>Out of stock</option></select></label><label>Search<input id="stockSearch" placeholder="Product, SKU or brand"></label></div>
+        <div class="table-wrap"><table><thead><tr><th>Product</th><th>Brand</th><th>Category</th><th>Purchased</th><th>Sold</th><th>On hand</th><th>Sales value</th><th>Status</th></tr></thead><tbody id="pointCookStockBody"></tbody></table></div>
+      </div>
+      <div class="report-grid">
+        <div class="card"><div class="section-head"><div><div class="eyebrow">CATEGORIES</div><h2>Category performance</h2></div></div><div class="table-wrap"><table><thead><tr><th>Category</th><th>SKUs</th><th>Purchased</th><th>Sold</th><th>Stock</th><th>Sales</th></tr></thead><tbody id="pointCookCategoryBody"></tbody></table></div></div>
+        <div class="card"><div class="section-head"><div><div class="eyebrow">TOP SELLERS</div><h2>Best-moving products</h2></div></div><div id="pointCookTopSellers" class="stock-ranking"></div><p class="notice">Suggested categories: Protein, Pre-Workout, Creatine, Aminos & Intra, Hydration, Vitamins & Wellness, Weight Management, Snacks & Bars, Energy & RTD, Accessories and Other.</p></div>
       </div>
     </section>
 

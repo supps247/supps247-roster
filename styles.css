@@ -37,3 +37,8 @@ th{background:#f3f7fc;text-transform:uppercase;letter-spacing:.35px;font-size:11
 .summary-item{background:linear-gradient(145deg,#fff,#f7faff)}.store-card{background:linear-gradient(145deg,#fff,#f8fbff)}.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.report-grid table{min-width:560px}
 @media(max-width:1050px){#appView{padding-left:0}.tabs{position:static;width:100%;flex-direction:row;overflow:auto;margin-bottom:18px;padding:9px}.nav-title{display:none}.tab{width:auto;white-space:nowrap}.dashboard-hero{align-items:flex-start;flex-direction:column}.report-grid{grid-template-columns:1fr}}
 @media(max-width:600px){.tabs .tab span{display:none}.dashboard-hero{padding:20px}.hero-actions,.hero-actions .btn{width:100%}.report-grid{display:block}}
+
+/* Point Cook sales & stock */
+.stock-hero{background:linear-gradient(135deg,#fff 0%,#eff6ff 48%,#ecfdf5 100%)}
+.stock-stats{margin-bottom:18px}.stock-ranking{display:flex;flex-direction:column;gap:9px}.stock-rank{display:flex;gap:12px;align-items:center;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#f8fbff}.stock-rank>span{display:grid;place-items:center;width:31px;height:31px;border-radius:9px;background:#e0e7ff;color:#3730a3;font-weight:900}.stock-rank div{min-width:0}.stock-rank strong,.stock-rank small{display:block}.stock-rank small{margin-top:3px;color:var(--muted)}
+#pointCookStockView table{min-width:980px}
