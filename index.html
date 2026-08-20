@@ -108,7 +108,7 @@
           <label>To<input id="accountsDateTo" type="date"></label>
           <button id="accountsLastMonthBtn" class="btn secondary" type="button">Paid last month</button>
           <button id="accountsClearDatesBtn" class="btn secondary" type="button">Clear dates</button>
-          <label>Order by<select id="accountsDateSort"><option value="invoice-asc">Invoice number ↑</option><option value="invoice-desc">Invoice number ↓</option><option value="newest">Created date — newest</option><option value="oldest">Created date — oldest</option></select></label>
+          <label>Order by<select id="accountsDateSort"><option value="invoice-desc" selected>Invoice number ↓ (newest/highest first)</option><option value="invoice-asc">Invoice number ↑ (oldest/lowest first)</option><option value="newest">Created date — newest</option><option value="oldest">Created date — oldest</option></select></label>
           <label>Search<input id="accountsSearch" placeholder="Invoice or supplier"></label>
           <button id="importReceivingBtn" class="btn secondary">Import receiving file</button>
           <input id="receivingFileInput" type="file" accept=".txt,.csv" class="hidden">
