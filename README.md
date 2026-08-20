@@ -136,3 +136,7 @@ Loaded 17 Lightspeed Point Cook purchase-order CSV exports (POI-481 through POI-
 ## Accounts invoice-number ordering — 20 August 2026
 
 Accounts now defaults to invoice-number order so invoice/order numbers appear in a clean numeric/alphanumeric sequence. The Order by control also allows invoice descending and created-date newest/oldest views.
+
+## Accounts manual date + refresh-page fix — 20 August 2026
+
+Manual due-date edits are now preserved. Once an admin changes a due date in the invoice editor, the supplier-term auto-calculation no longer overwrites that manually selected date during save, Supabase reload, or refresh. The app also remembers the active workspace in the browser, so refreshing while viewing Accounts, Payroll, Point Cook Stock, Roster, or another tab reopens that same workspace instead of returning to Dashboard.
