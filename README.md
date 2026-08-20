@@ -131,3 +131,8 @@ Added a dedicated **Point Cook Stock** workspace for product-level sales, purcha
 ## Point Cook April 2026 purchase data
 
 Loaded 17 Lightspeed Point Cook purchase-order CSV exports (POI-481 through POI-511 supplied in this chat). The app now starts with 148 unique Point Cook products, 715 received purchase units and $24,018.32 of recorded supply cost from those files. The CSV exports do not contain the exact April purchase date, so movements are tagged to April 2026 and retain the original PO number/source filename. The exported `stock` field is also retained as the product on-hand figure from the source files.
+
+
+## Accounts invoice-number ordering — 20 August 2026
+
+Accounts now defaults to invoice-number order so invoice/order numbers appear in a clean numeric/alphanumeric sequence. The Order by control also allows invoice descending and created-date newest/oldest views.
